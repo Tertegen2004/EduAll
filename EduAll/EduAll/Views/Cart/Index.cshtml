@@ -1,0 +1,199 @@
+﻿@using EduAll.ViewModel
+@model Cart_vm
+
+@{
+    ViewData["Title"] = "My Cart";
+    Layout = "_Layout";
+}
+<!-- ==================== Breadcrumb Start Here ==================== -->
+<section class="breadcrumb py-120 bg-main-25 position-relative z-1 overflow-hidden mb-0">
+    <img src="assets/images/shapes/shape1.png"
+         alt=""
+         class="shape one animation-rotation d-md-block d-none" />
+    <img src="assets/images/shapes/shape2.png"
+         alt=""
+         class="shape two animation-scalation d-md-block d-none" />
+    <img src="assets/images/shapes/shape3.png"
+         alt=""
+         class="shape eight animation-walking d-md-block d-none" />
+    <img src="assets/images/shapes/shape5.png"
+         alt=""
+         class="shape six animation-walking d-md-block d-none" />
+    <img src="assets/images/shapes/shape4.png"
+         alt=""
+         class="shape four animation-scalation" />
+    <img src="assets/images/shapes/shape4.png"
+         alt=""
+         class="shape nine animation-scalation" />
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="breadcrumb__wrapper">
+                    <h1 class="breadcrumb__title display-4 fw-semibold text-center">
+                        Cart
+                    </h1>
+                    <ul class="breadcrumb__list d-flex align-items-center justify-content-center gap-4">
+                        <li class="breadcrumb__item">
+                            <a asp-action="index" asp-controller="home"
+                               class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium">
+                                <i class="text-lg d-inline-flex ph-bold ph-house"></i>
+                                Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <a href="course.html"
+                               class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium">
+                            </a>
+                        </li>
+                        <li class="breadcrumb__item d-none">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <span class="text-main-two-600"> Cart</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==================== Breadcrumb End Here ==================== -->
+<!-- =============================== Cart Section Start ================================== -->
+
+
+<div class="py-120">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-8">
+                <div class="border border-neutral-30 rounded-12 bg-main-25 p-32 bg-main-25">
+
+                    <h4 class="mb-0">
+                        Cart <span class="text-neutral-100 fw-normal">(@Model.Items.Count items)</span>
+                    </h4>
+
+                    <span class="d-block border border-neutral-30 my-24 border-dashed"></span>
+
+                    @if (Model.Items.Any())
+                    {
+                        <div class="table-responsive overflow-x-auto">
+                            <table class="table min-w-max vertical-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-neutral-500 fw-semibold px-24 py-20 border-0">Course</th>
+                                        <th class="text-neutral-500 fw-semibold px-24 py-20 border-0">Category</th>
+                                        <th class="text-neutral-500 fw-semibold px-24 py-20 border-0">Price</th>
+                                        <th class="text-neutral-500 fw-semibold px-24 py-20 border-0"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td class="border-bottom border-dashed border-neutral-40 text-neutral-500 bg-transparent px-24 py-20">
+                                                <div class="d-flex align-items-center gap-24">
+                                                    <div class="w-60 h-60 border border-neutral-40 rounded-8 d-flex justify-content-center align-items-center bg-white overflow-hidden">
+                                                        <img src="@item.CourseImg" alt="@item.CourseTitle" class="w-100 h-100 object-fit-cover" />
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="text-md mb-0 text-line-1">
+                                                            <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId" class="text-neutral-700 hover-text-main-600">
+                                                                @item.CourseTitle
+                                                            </a>
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="border-bottom border-dashed border-neutral-40 text-neutral-500 bg-transparent px-24 py-20">
+                                                <span class="py-4 px-12 rounded-pill bg-main-50 text-main-600 text-sm fw-medium">@item.CategoryName</span>
+                                            </td>
+
+                                            <td class="border-bottom border-dashed border-neutral-40 text-neutral-500 bg-transparent px-24 py-20">
+                                                <h6 class="text-md mb-0 text-main-two-600 fw-bold">$@item.Price</h6>
+                                            </td>
+
+                                            <td class="border-bottom border-dashed border-neutral-40 text-neutral-500 bg-transparent px-24 py-20">
+                                                <form asp-action="Remove" method="post">
+                                                    <input type="hidden" name="id" value="@item.CartItemId" />
+                                                    <button type="submit" class="delete-btn text-lg hover-text-danger-600 transition-2 bg-transparent border-0 p-0 text-neutral-400">
+                                                        <i class="ph ph-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <a asp-controller="Course" asp-action="Index" class="flex-align gap-8 text-main-600 hover-text-decoration-underline transition-1 fw-semibold mt-24">
+                                <i class="ph ph-arrow-left"></i> Continue Shopping
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="w-80 h-80 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-4xl mb-16">
+                                <i class="ph ph-shopping-cart"></i>
+                            </div>
+                            <h5 class="text-neutral-500">Your cart is empty.</h5>
+                            <a asp-controller="Course" asp-action="Index" class="btn btn-main rounded-pill mt-3">Browse Courses</a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Items.Any())
+            {
+                <div class="col-lg-4">
+                    <div class="border border-neutral-30 rounded-12 bg-main-25 p-24 bg-main-25" style="top: 100px;">
+
+                        <span class="text-neutral-700 text-lg mb-12 d-block fw-bold">Order Summary</span>
+
+                        <div class="d-flex flex-column gap-24 mt-24">
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Subtotal</span>
+                                <span class="text-neutral-700 fw-medium">$@Model.SubTotal</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Tax</span>
+                                <span class="text-neutral-700 fw-medium">$@Model.Tax</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Discount</span>
+                                <span class="text-main-two-600 fw-medium">-$@Model.Discount</span>
+                            </div>
+                        </div>
+
+                        <span class="d-block border border-neutral-30 my-24 border-dashed"></span>
+
+                        <form action="#" class="my-24 position-relative">
+                            <input type="text" class="form-control bg-white shadow-none border border-neutral-30 rounded-pill h-48 ps-24 pe-44 focus-border-main-600" placeholder="Enter Coupon Code" />
+                            <button type="button" class="w-36 h-36 flex-center rounded-circle bg-main-600 text-white hover-bg-main-800 position-absolute top-50 translate-middle-y inset-inline-end-0 me-8">
+                                <i class="ph ph-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <div class="d-flex align-items-center justify-content-between gap-4">
+                            <span class="text-neutral-500 fw-bold text-lg">Total</span>
+                            <span class="text-main-600 fw-bold text-xl">$@Model.Total</span>
+                        </div>
+
+                        <span class="d-block border border-neutral-30 mt-24 border-dashed"></span>
+
+                        <a asp-controller="Checkout" asp-action="Index" class="btn btn-main rounded-pill w-100 mt-40">
+                            Proceed to Checkout
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<!-- =============================== Cart Section End ================================== -->

@@ -1,0 +1,116 @@
+﻿@using EduAll.ViewModel
+@model Checkout_vm
+
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "_Layout";
+}
+
+<div class="py-120">
+    <div class="container">
+        <form asp-action="ProcessPayment" method="post">
+            <div class="row">
+
+                <div class="col-lg-8">
+                    <div class="border border-neutral-30 rounded-12 bg-main-25 p-32 bg-main-25">
+                        <h4 class="mb-12">Billing address</h4>
+
+                        <div class="row gy-4">
+                            <div class="col-sm-6">
+                                <label class="form-label">Full Name</label>
+                                <input asp-for="FullName" class="common-input bg-white rounded-pill border-neutral-40" placeholder="Enter Name" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Email</label>
+                                <input asp-for="Email" class="common-input bg-white rounded-pill border-neutral-40" placeholder="Enter Email" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Phone</label>
+                                <input asp-for="Phone" class="common-input bg-white rounded-pill border-neutral-40" placeholder="Enter Phone">
+                            </div>
+                            <div class="col-sm-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="common-input bg-white rounded-24 border-neutral-40" rows="2" placeholder="Enter full address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-neutral-30 rounded-12 bg-main-25 p-32 bg-main-25 mt-24">
+                        <h4 class="mb-12">Payment methods</h4>
+
+                        <div class="d-flex align-items-center gap-24 flex-wrap mb-24">
+                            <div class="form-check common-check common-radio mb-0">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                                <label class="form-check-label fw-normal" for="creditCard">Credit card</label>
+                            </div>
+                            <div class="form-check common-check common-radio mb-0">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paypal">
+                                <label class="form-check-label fw-normal" for="paypal">PayPal</label>
+                            </div>
+                        </div>
+
+                        <span class="d-block border border-neutral-30 my-24 border-dashed"></span>
+
+                        <div class="row gy-4">
+                            <div class="col-sm-12">
+                                <label class="form-label">Card Number</label>
+                                <input asp-for="CardNumber" class="common-input bg-white rounded-pill border-neutral-40" placeholder="0000 0000 0000 0000" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Expiry Date</label>
+                                <input asp-for="ExpiryDate" type="month" class="common-input bg-white rounded-pill border-neutral-40" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">CVC / CVV</label>
+                                <input asp-for="CVV" class="common-input bg-white rounded-pill border-neutral-40" placeholder="123" required>
+                            </div>
+                            <div class="col-sm-12">
+                                <label class="form-label">Name on Card</label>
+                                <input asp-for="CardName" class="common-input bg-white rounded-pill border-neutral-40" placeholder="Name on Card" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="border border-neutral-30 rounded-12 bg-main-25 p-24 bg-main-25 sticky-top" style="top: 100px;">
+                        <span class="text-neutral-700 text-lg mb-12 d-block fw-bold">Order Summary</span>
+
+                        <div class="d-flex flex-column gap-24 mt-24">
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Base Price</span>
+                                <span class="text-neutral-700 fw-medium">$@Model.SubTotal</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Tax</span>
+                                <span class="text-neutral-700 fw-medium">$@Model.Tax</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between gap-4">
+                                <span class="text-neutral-500">Discount</span>
+                                <span class="text-main-two-600 fw-medium">-$@Model.Discount</span>
+                            </div>
+                        </div>
+
+                        <span class="d-block border border-neutral-30 my-24 border-dashed"></span>
+
+                        <div class="d-flex align-items-center justify-content-between gap-4">
+                            <span class="text-neutral-500 fw-bold text-lg">Total Payable</span>
+                            <span class="text-main-600 fw-bold text-xl">$@Model.Total</span>
+                        </div>
+
+                        <input type="hidden" asp-for="SubTotal" />
+                        <input type="hidden" asp-for="Tax" />
+                        <input type="hidden" asp-for="Discount" />
+
+                        <span class="d-block border border-neutral-30 mt-24 border-dashed"></span>
+
+                        <button type="submit" class="btn btn-main rounded-pill w-100 mt-40">
+                            Confirm Payment <i class="ph-bold ph-check-circle ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>

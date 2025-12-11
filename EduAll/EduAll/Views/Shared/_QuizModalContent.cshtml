@@ -1,0 +1,59 @@
+﻿@using EduAll.ViewModel
+@model QuizAttemp_vm
+
+<div class="quiz-container">
+    <div class="d-flex justify-content-between align-items-center mb-24 bg-white p-16 rounded-12 border border-neutral-30">
+        <h5 class="mb-0 text-main-600">@Model.QuizTitle</h5>
+        <span class="badge bg-main-50 text-main-600 rounded-pill px-12 py-6 border border-main-100">
+            @Model.Questions.Count Questions
+        </span>
+    </div>
+
+    <form id="quizForm" onsubmit="submitQuizAnswer(event)">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="QuizId" value="@Model.QuizId" />
+        <input type="hidden" name="CourseId" value="@Model.CourseId" />
+
+        <div class="questions-list d-flex flex-column gap-24">
+            @foreach (var question in Model.Questions.Select((val, i) => new { val, i }))
+            {
+                <div class="question-card bg-white border border-gray-100 p-24 rounded-12 shadow-sm">
+                    <h6 class="fw-bold mb-16 text-neutral-800 d-flex align-items-start gap-2">
+                        <span class="badge bg-main-600 text-white rounded-circle w-24 h-24 flex-center text-xs">@(question.i + 1)</span>
+                        @question.val.Text
+                        <span class="ms-auto badge bg-gray-100 text-gray-600 rounded-pill px-8 text-xs fw-normal">@question.val.Score marks</span>
+                    </h6>
+
+                    <div class="options-list d-flex flex-column gap-12 ps-4">
+                        @foreach (var option in question.val.Options)
+                        {
+                            <div class="form-check custom-radio d-flex align-items-center gap-2">
+                                <input class="form-check-input mt-0" type="radio"
+                                       name="Answers[@question.val.QuestionId]"
+                                       value="@option.OptionId"
+                                       id="opt-@option.OptionId" required> <label class="form-check-label text-neutral-600 cursor-pointer w-100 py-2 px-3 rounded-8 hover-bg-gray-50 transition-1" for="opt-@option.OptionId">
+                                    @option.Text
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex justify-content-end mt-32 border-top pt-24">
+            <button type="submit" class="btn btn-main rounded-pill px-40 py-12 flex-align gap-8 shadow-lg hover-scale-1">
+                Submit Answers <i class="ph-bold ph-paper-plane-right"></i>
+            </button>
+        </div>
+    </form>
+
+    <div id="quizResult" class="d-none text-center py-40">
+        <div class="mb-16 result-icon"></div>
+        <h3 class="result-title mb-8 fw-bold"></h3>
+        <p class="result-score text-xl text-neutral-600 mb-32"></p>
+        <div class="flex-center gap-16">
+            <button onclick="location.reload()" class="btn btn-outline-gray rounded-pill px-32">Close</button>
+        </div>
+    </div>
+</div>

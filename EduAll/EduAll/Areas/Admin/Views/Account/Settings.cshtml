@@ -1,0 +1,246 @@
+﻿@model AccountSettings_vm
+
+@{
+    ViewData["Title"] = "Account Settings";
+
+    Layout = "_AdminLayout";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                @if (User.IsInRole("Student"))
+                {
+                    <li><a asp-controller="Home" asp-area="" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                }
+                else
+                {
+                    <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                }
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Settings</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="card-body p-0">
+
+            <div class="cover-img position-relative">
+                <div class="avatar-upload">
+                    <div class="avatar-preview">
+                        <div id="coverImagePreview" style="background-image: url('/Admin/assets/images/thumbs/setting-cover-img.png');"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-profile px-24">
+                <div class="flex-between">
+                    <div class="d-flex align-items-end flex-wrap mb-32 gap-24">
+                        <img src="@(string.IsNullOrEmpty(Model.Profile.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : Model.Profile.ImgUrl)"
+                             alt="User" class="w-120 h-120 rounded-circle border border-white object-fit-cover">
+
+                        <div>
+                            <h4 class="mb-8">@Model.Profile.FirstName @Model.Profile.LastName</h4>
+                            <div class="setting-profile__infos flex-align flex-wrap gap-16">
+                                <div class="flex-align gap-6">
+                                    <span class="text-gray-600 d-flex text-lg"><i class="ph ph-swatches"></i></span>
+                                    <span class="text-gray-600 d-flex text-15">@Model.Profile.JobTitle</span>
+                                </div>
+                                <div class="flex-align gap-6">
+                                    <span class="text-gray-600 d-flex text-lg"><i class="ph ph-envelope"></i></span>
+                                    <span class="text-gray-600 d-flex text-15">@Model.Profile.Email</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav common-tab style-two nav-pills mb-0" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-details-tab" data-bs-toggle="pill" data-bs-target="#pills-details" type="button" role="tab">My Details</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-password-tab" data-bs-toggle="pill" data-bs-target="#pills-password" type="button" role="tab">Password</button>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="tab-content" id="pills-tabContent">
+
+        <div class="tab-pane fade show active" id="pills-details" role="tabpanel">
+            <div class="card mt-24">
+                <div class="card-header border-bottom">
+                    <h4 class="mb-4">My Details</h4>
+                    <p class="text-gray-600 text-15">Update your personal information</p>
+                </div>
+                <div class="card-body">
+
+                    <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+                        <div class="row gy-4">
+
+                            <div class="col-sm-6">
+                                <label asp-for="Profile.FirstName" class="form-label mb-8 h6"></label>
+                                <input asp-for="Profile.FirstName" class="form-control py-11" placeholder="First Name">
+                                <span asp-validation-for="Profile.FirstName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label asp-for="Profile.LastName" class="form-label mb-8 h6"></label>
+                                <input asp-for="Profile.LastName" class="form-control py-11" placeholder="Last Name">
+                                <span asp-validation-for="Profile.LastName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label asp-for="Profile.Email" class="form-label mb-8 h6"></label>
+                                <input asp-for="Profile.Email" class="form-control py-11" placeholder="Email">
+                                <span asp-validation-for="Profile.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label asp-for="Profile.PhoneNumber" class="form-label mb-8 h6"></label>
+                                <input asp-for="Profile.PhoneNumber" class="form-control py-11" placeholder="Phone Number">
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="col-12">
+                                    <label asp-for="Profile.JobTitle" class="form-label mb-8 h6">Job Title / Role</label>
+                                    <input asp-for="Profile.JobTitle" class="form-control py-11" placeholder="e.g. Senior Developer">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <label asp-for="Profile.JobTitle" class="form-label mb-8 h6">Job Title / Role</label>
+                                    <input asp-for="Profile.JobTitle" value="" disabled class="form-control py-11" placeholder="e.g. Senior Developer">
+                                </div>
+                            }
+
+                            <div class="col-12">
+                                <label class="form-label mb-8 h6">Your Photo</label>
+                                <div class="flex-align gap-22">
+                                    <div class="avatar-upload flex-shrink-0">
+                                        <input type="file" asp-for="Profile.ImageFile" id="imageUpload" accept="image/*">
+                                        <div class="avatar-preview">
+                                            <div id="profileImagePreview"
+                                                 style="background-image: url('@(string.IsNullOrEmpty(Model.Profile.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : Model.Profile.ImgUrl)');">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="avatar-upload-box text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 transition-2 cursor-pointer">
+                                        <label for="imageUpload" class="position-absolute inset-block-start-0 inset-inline-start-0 w-100 h-100 rounded-16 cursor-pointer z-1"></label>
+                                        <span class="text-32 icon text-main-600 d-inline-flex"><i class="ph ph-upload"></i></span>
+                                        <span class="text-13 d-block text-gray-400 text my-8">Click to upload or drag and drop</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="editor">
+                                    <label class="form-label mb-8 h6">Bio</label>
+                                    <div id="editor" style="height: 150px;">
+                                        @Html.Raw(Model.Profile.Bio)
+                                    </div>
+                                    <input type="hidden" asp-for="Profile.Bio" id="BioInput" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-main rounded-pill py-9 px-24">Save Changes</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-password" role="tabpanel">
+            <div class="card mt-24">
+                <div class="card-header border-bottom">
+                    <h4 class="mb-4">Password Settings</h4>
+                    <p class="text-gray-600 text-15">Ensure your account is using a long, random password to stay secure.</p>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" method="post">
+                        <div class="row gy-4">
+
+                            <div class="col-12">
+                                <label asp-for="Password.CurrentPassword" class="form-label mb-8 h6"></label>
+                                <input asp-for="Password.CurrentPassword" class="form-control py-11" placeholder="Enter Current Password">
+                                <span asp-validation-for="Password.CurrentPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Password.NewPassword" class="form-label mb-8 h6"></label>
+                                <input asp-for="Password.NewPassword" class="form-control py-11" placeholder="Enter New Password">
+                                <span asp-validation-for="Password.NewPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Password.ConfirmNewPassword" class="form-label mb-8 h6"></label>
+                                <input asp-for="Password.ConfirmNewPassword" class="form-control py-11" placeholder="Confirm New Password">
+                                <span asp-validation-for="Password.ConfirmNewPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-main rounded-pill py-9 px-24">Update Password</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+
+            // 1. Alert Animation
+            $(".alert").fadeIn(600);
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () { $(this).remove(); });
+            }, 2000);
+
+            // 1. إعدادات Quill Editor للـ Bio
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Write a short bio about yourself...'
+            });
+
+            quill.on('text-change', function () {
+                $('#BioInput').val(quill.root.innerHTML);
+            });
+
+            // 2. معاينة الصورة
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profileImagePreview').css('background-image', 'url('+e.target.result +')');
+                        $('#profileImagePreview').hide();
+                        $('#profileImagePreview').fadeIn(650);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#imageUpload").change(function() {
+                readURL(this);
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,138 @@
+﻿@model Register_vm
+
+@{
+    ViewData["Title"] = "Sign Up";
+    Layout = "_main";
+}
+
+<section class="auth d-flex">
+    <div class="auth-left bg-main-50 flex-center p-24">
+        <img src="/Admin/assets/images/thumbs/auth-img2.png" alt="Register Image">
+    </div>
+
+    <div class="auth-right py-40 px-24 flex-center flex-column">
+        <div class="auth-right__inner mx-auto w-100">
+
+            <a asp-controller="Home" asp-action="Index" class="auth-right__logo">
+                <img src="/Admin/assets/images/logo/logo.png" alt="Logo">
+            </a>
+
+            <h2 class="mb-8">Sign Up</h2>
+            <p class="text-gray-600 text-15 mb-32">Please sign up to create your account</p>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-24">
+                        <label asp-for="FirstName" class="form-label mb-8 h6"></label>
+                        <div class="position-relative">
+                            <input asp-for="FirstName" class="form-control py-11 ps-40" placeholder="First Name">
+                            <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-user"></i></span>
+                        </div>
+                        <span asp-validation-for="FirstName" class="text-danger text-sm"></span>
+                    </div>
+                    <div class="col-md-6 mb-24">
+                        <label asp-for="LastName" class="form-label mb-8 h6"></label>
+                        <div class="position-relative">
+                            <input asp-for="LastName" class="form-control py-11 ps-40" placeholder="Last Name">
+                            <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-user"></i></span>
+                        </div>
+                        <span asp-validation-for="LastName" class="text-danger text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="mb-24">
+                    <label asp-for="Email" class="form-label mb-8 h6"></label>
+                    <div class="position-relative">
+                        <input asp-for="Email" class="form-control py-11 ps-40" placeholder="Type your email address">
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-envelope"></i></span>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="mb-24">
+                    <label class="form-label mb-8 h6">Country</label> <div class="position-relative">
+                        <select name="Country" class="form-control py-11 ps-40">
+                            <option value="" selected disabled>Select your country</option>
+                            <option value="Egypt">Egypt</option>
+                            <option value="USA">USA</option>
+                            <option value="UK">UK</option>
+                            <option value="KSA">Saudi Arabia</option>
+                            <option value="UAE">UAE</option>
+                        </select>
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-globe"></i></span>
+                    </div>
+                </div>
+
+                <div class="mb-24">
+                    <label asp-for="Password" class="form-label mb-8 h6"></label>
+                    <div class="position-relative">
+                        <input asp-for="Password" class="form-control py-11 ps-40 password-input" placeholder="Enter Password">
+                        <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer text-gray-600">
+                            <i class="ph ph-eye-slash" id="toggleIcon"></i>
+                        </span>
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-lock"></i></span>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="mb-24">
+                    <label asp-for="ConfirmPassword" class="form-label mb-8 h6"></label>
+                    <div class="position-relative">
+                        <input asp-for="ConfirmPassword" type="password" class="form-control py-11 ps-40 password-input-confirm" placeholder="Confirm Password">
+                        <span class="toggle-password-confirm position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer text-gray-600">
+                            <i class="ph ph-eye-slash" id="toggleIconConfirm"></i>
+                        </span>
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i class="ph ph-lock-key"></i></span>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger text-sm"></span>
+                </div>
+
+                <button type="submit" class="btn btn-main rounded-pill w-100">Sign Up</button>
+
+                <p class="mt-32 text-gray-600 text-center">
+                    Already have an account? <a asp-action="Signin" class="text-main-600 hover-text-decoration-underline">Log In</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+
+            // 1. إظهار/إخفاء الباسورد الأساسي
+            $(".toggle-password").click(function () {
+                var input = $(".password-input");
+                var icon = $("#toggleIcon");
+
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text");
+                    icon.removeClass("ph-eye-slash").addClass("ph-eye");
+                } else {
+                    input.attr("type", "password");
+                    icon.removeClass("ph-eye").addClass("ph-eye-slash");
+                }
+            });
+
+            // 2. إظهار/إخفاء تأكيد الباسورد
+            $(".toggle-password-confirm").click(function () {
+                var input = $(".password-input-confirm");
+                var icon = $("#toggleIconConfirm");
+
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text");
+                    icon.removeClass("ph-eye-slash").addClass("ph-eye");
+                } else {
+                    input.attr("type", "password");
+                    icon.removeClass("ph-eye").addClass("ph-eye-slash");
+                }
+            });
+
+        });
+    </script>
+}

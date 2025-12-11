@@ -1,0 +1,406 @@
+﻿@using EduAll.Areas.Admin.ViewModels
+@model CreateCourse_vm
+@{
+    ViewData["Title"] = "CreateCourse";
+}
+
+
+<div class="dashboard-body">
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li>
+                    <a asp-action="index" asp-controller="home"
+                       class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a>
+                </li>
+                <li>
+                    <span class="text-gray-500 fw-normal d-flex">
+                        <i class="ph ph-caret-right"></i>
+                    </span>
+                </li>
+                <li>
+                    <span class="text-main-600 fw-normal text-15">Create Account</span>
+                </li>
+            </ul>
+        </div>
+        <!-- Breadcrumb End -->
+        <!-- Buttons Start -->
+        <div class="flex-align justify-content-end gap-8">
+            <button type="button"
+                    class="btn btn-main rounded-pill py-9"
+                    disabled>
+                Publish Course
+            </button>
+        </div>
+        <!-- Buttons End -->
+    </div>
+
+    <!-- Create Course Step List Start -->
+    <ul class="step-list mb-24">
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 active">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Course Details
+            <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Upload Videos
+            <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Create Quiz
+            <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Publish Course
+            <span class="line position-relative"></span>
+        </li>
+    </ul>
+    <!-- Create Course Step List End -->
+    <!-- Course Tab Start -->
+    <div class="card">
+        <div class="card-header border-bottom border-gray-100 flex-align gap-8">
+            <h5 class="mb-0">Course Details</h5>
+            <button type="button"
+                    class="text-main-600 text-md d-flex"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Course Details">
+                <i class="ph-fill ph-question"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            @{
+                // لو الـ Id أكبر من صفر، يبقى تعديل، غير كده إنشاء جديد
+                var actionName = Model != null && Model.Id > 0 ? "Edit" : "CreateCourse";
+            }
+            <form asp-action="@actionName" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div class="row gy-20">
+
+                    <div class="col-xxl-3 col-md-4 col-sm-5">
+                        <div class="mb-20">
+                            <label class="h5 fw-semibold font-heading mb-0">
+                                Course Image <span class="text-13 text-gray-400 fw-medium">(Required)</span>
+                            </label>
+                        </div>
+
+                        <div class="upload-image-wrapper position-relative border border-dashed border-gray-200 rounded-12 d-flex justify-content-center align-items-center bg-main-25 overflow-hidden"
+                             style="height: 260px; cursor: pointer;">
+
+                            @{
+                                // بنشوف هل فيه مسار صورة مبعوت من الكنترولر؟
+                                var dbImage = ViewBag.CurrentImgUrl as string;
+                                var hasImage = !string.IsNullOrEmpty(dbImage);
+                            }
+
+                            <img id="imagePreview"
+                                 src="@(hasImage ? dbImage : "#")"
+                                 alt="Course Preview"
+                                 class="position-absolute w-100 h-100 object-fit-cover"
+                                 style="z-index: 1; @(hasImage ? "" : "display: none;")" />
+
+                            <div class="text-center z-0" id="uploadPlaceholder" style="@(hasImage ? "display: none;" : "")">
+                                <span class="w-60 h-60 bg-white rounded-circle d-flex justify-content-center align-items-center mx-auto shadow-sm mb-3 text-primary fs-2">
+                                    <i class="ph ph-cloud-arrow-up" style="font-size: 32px; color: #27CFA7;"></i>
+                                </span>
+                                <p class="text-gray-500 mb-0">Click to upload image</p>
+                                <p class="text-gray-400 text-13">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                            </div>
+
+                            <input type="file"
+                                   asp-for="ImgUrl"
+                                   id="realImageInput"
+                                   class="position-absolute w-100 h-100 opacity-0"
+                                   style="top: 0; left: 0; cursor: pointer; z-index: 5;"
+                                   accept="image/*" />
+                        </div>
+
+                        <span asp-validation-for="ImgUrl" class="text-danger mt-2 d-block"></span>
+                    </div>
+
+                    <div class="col-xxl-9 col-md-8 col-sm-7">
+                        <div class="row g-20">
+                            <div class="col-sm-12">
+                                <label asp-for="Title"
+                                       class="h5 mb-8 fw-semibold font-heading">
+                                </label>
+                                    <span class="text-13 text-gray-400 fw-medium">(Required)</span>
+                                <div class="position-relative">
+                                    <input type="text"
+                                           asp-for="Title"
+                                           class="text-counter placeholder-13 form-control py-11 pe-76"
+                                           maxlength="100"
+                                           placeholder="Name of the Lesson" />
+
+                                    <div class="text-gray-400 position-absolute inset-inline-end-0 top-50 translate-middle-y me-16">
+                                        <span id="current">0</span>
+                                        <span id="maximum">/ 100</span>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Title" class="text-danger"></span>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="CategoryId"
+                                       class="h5 mb-8 fw-semibold font-heading">
+                                </label>
+                                <div class="position-relative">
+                                    <select asp-for="CategoryId" asp-items="ViewBag.Categories"
+                                            class="form-select py-9 placeholder-13 text-15">
+                                        <option value="" disabled selected>
+                                            Enter course category
+                                        </option>
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="InstructorId" class="h5 mb-8 fw-semibold font-heading">
+                                </label>
+                                    <span class="text-13 text-gray-400 fw-medium">(Required)</span>
+                                <div class="position-relative">
+                                    <select asp-for="InstructorId" asp-items="ViewBag.Instructors" class="form-select py-9 placeholder-13 text-15">
+                                        <option value="" selected disabled>Select Instructor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Level" class="h5 mb-8 fw-semibold font-heading"></label>
+                                <div class="position-relative">
+                                    <select asp-for="Level" asp-items="ViewBag.Levels" class="form-select py-9 placeholder-13 text-15">
+                                        <option value="" selected disabled>Select Course Level</option>
+                                    </select>
+                                    <span asp-validation-for="Level" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Duration"
+                                       class="h5 mb-8 fw-semibold font-heading"></label>
+                                <div class="position-relative">
+                                    <input type="number"
+                                           asp-for="Duration"
+                                           value="@(Model.Duration == 0 ? "" : Model.Duration)"
+                                           class="text-counter placeholder-13 form-control py-11 pe-76"
+                                           placeholder="Duration Of Course" />
+                                    <div class="text-gray-400 position-absolute inset-inline-end-0 bottom-50 me-16">
+                                        <span>Hours</span>
+                                    </div>
+                                    <span asp-validation-for="Duration" class="text-danger"></span>
+
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Price"
+                                       class="h5 mb-8 fw-semibold font-heading"></label>
+                                <div class="position-relative align-c">
+                                    <input type="number"
+                                           asp-for="Price"
+                                           value="@(Model.Price == 0 ? "" : Model.Price)"
+                                           class="text-counter placeholder-13 form-control py-11 pe-76"
+                                           placeholder="Price Of Course" />
+                                    <div class="text-gray-400 position-absolute inset-inline-end-0 bottom-50 me-16">
+                                        <span>$</span>
+                                    </div>
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Language" class="h5 mb-8 fw-semibold font-heading"></label>
+                                <div class="position-relative">
+                                    <select asp-for="Language" asp-items="ViewBag.Language" class="form-select py-9 placeholder-13 text-15">
+                                        <option value="" selected disabled>Select Course Language</option>
+                                    </select>
+                                    <span asp-validation-for="Language" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="editor">
+                                    <label asp-for="Description" class="form-label mb-8 h5"></label>
+
+                                    <div id="editor" style="height: 200px;">
+                                        @Html.Raw(Model?.Description)
+                                    </div>
+
+                                    <input type="hidden" asp-for="Description" id="DescriptionInput" />
+
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-align justify-content-end gap-8">
+                        <a asp-action="index" asp-controller="home"
+                           class="btn btn-outline-main rounded-pill py-9">Cancel</a>
+                        <button type="submit" class="btn btn-main rounded-pill py-9">Continue</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Course Tab End -->
+</div>
+<div class="dashboard-footer">
+    <div class="flex-between flex-wrap gap-16">
+        <p class="text-gray-300 text-13 fw-normal">
+            &copy; Copyright Edmate 2024, All Right Reserverd
+        </p>
+        <div class="flex-align flex-wrap gap-16">
+            <a href="#"
+               class="text-gray-300 text-13 fw-normal hover-text-main-600 hover-text-decoration-underline">License</a>
+            <a href="#"
+               class="text-gray-300 text-13 fw-normal hover-text-main-600 hover-text-decoration-underline">More Themes</a>
+            <a href="#"
+               class="text-gray-300 text-13 fw-normal hover-text-main-600 hover-text-decoration-underline">Documentation</a>
+            <a href="#"
+               class="text-gray-300 text-13 fw-normal hover-text-main-600 hover-text-decoration-underline">Support</a>
+        </div>
+    </div>
+</div>
+
+<!-- Jquery js -->
+<script src="assets/js/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap Bundle Js -->
+<script src="assets/js/boostrap.bundle.min.js"></script>
+<!-- Phosphor Js -->
+<script src="assets/js/phosphor-icon.js"></script>
+<!-- file upload -->
+<script src="assets/js/file-upload.js"></script>
+<!-- file upload -->
+<script src="assets/js/plyr.js"></script>
+<!-- dataTables -->
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<!-- full calendar -->
+<script src="assets/js/full-calendar.js"></script>
+<!-- jQuery UI -->
+<script src="assets/js/jquery-ui.js"></script>
+<!-- jQuery UI -->
+<script src="assets/js/editor-quill.js"></script>
+<!-- apex charts -->
+<script src="assets/js/apexcharts.min.js"></script>
+<!-- Calendar Js -->
+<script src="assets/js/calendar.js"></script>
+<!-- jvectormap Js -->
+<script src="assets/js/jquery-jvectormap-2.0.5.min.js"></script>
+<!-- jvectormap world Js -->
+<script src="assets/js/jquery-jvectormap-world-mill-en.js"></script>
+
+<!-- main js -->
+<script src="assets/js/main.js"></script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+
+            // 1. الحل الجذري لمشكلة تجاهل الحقول المخفية
+            // بدلاً من تغيير الإعدادات العامة، نعدل إعدادات الفورم الحالي مباشرة
+            var $form = $('form'); // هات الفورم
+            var validator = $form.data('validator'); // هات المفتش المسؤول عنه
+
+            if (validator) {
+                // بنقوله: "قائمة التجاهل بتاعتك فاضية، يعني فتش في كله حتى المخفي"
+                validator.settings.ignore = "";
+            }
+
+            // -----------------------------------------------------------
+            // 2. إعدادات Quill Editor والخدعة الثانية
+            // -----------------------------------------------------------
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Write course description here...'
+            });
+
+            var existingDescription = $('#DescriptionInput').val();
+
+            if (existingDescription) {
+                 // بنحطها جوه المحرر برمجياً
+                 quill.clipboard.dangerouslyPasteHTML(existingDescription);
+             } 
+
+
+
+
+            // دالة التحديث الذكية
+            quill.on('text-change', function () {
+                var html = quill.root.innerHTML;
+                var text = quill.getText().trim(); // هات النص الصافي بدون HTML
+
+                if (text.length === 0) {
+                    $('#DescriptionInput').val('');
+                } else {
+                    $('#DescriptionInput').val(html);
+                }
+
+                // شغل الفاليديشن فوراً
+                $('#DescriptionInput').valid();
+            });
+
+            // تأكيد أخير عند الإرسال
+            $('form').on('submit', function () {
+                var text = quill.getText().trim();
+                if (text.length === 0) {
+                    $('#DescriptionInput').val('');
+                } else {
+                    $('#DescriptionInput').val(quill.root.innerHTML);
+                }
+            });
+
+            // -----------------------------------------------------------
+            // 3. إعدادات رفع الصورة
+            // -----------------------------------------------------------
+
+
+            $(document).ready(function () {
+
+                // كود معاينة الصورة (Preview)
+                $("#realImageInput").change(function () {
+                    var input = this;
+
+                    // التأكد من اختيار ملف
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            // 1. اعرض الصورة في تاج الـ img
+                            $('#imagePreview').attr('src', e.target.result).fadeIn();
+
+                            // 2. اخفي الأيقونة والنص
+                            $('#uploadPlaceholder').hide();
+                        }
+
+                        reader.readAsDataURL(input.files[0]);
+
+                        // (اختياري) شيل رسالة الخطأ لو كانت ظاهرة
+                        $(this).valid();
+                    }
+                });
+
+                // (اختياري) حل مشكلة الفاليديشن مع التعديل
+                // لو فيه صورة قديمة ظاهرة، الغي شرط الـ Required من على الإنبوت
+                var hasOldImage = $('#imagePreview').is(':visible') && $('#imagePreview').attr('src') !== '#';
+                if (hasOldImage) {
+                    $('#realImageInput').removeAttr('data-val-required'); // إزالة الـ attributes الخاصة بالـ validation
+                    // أو استخدم الطريقة دي لو بتستخدم jquery validate
+                    $('#realImageInput').rules('remove', 'required');
+                }
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,218 @@
+﻿
+@model StudentDetails_vm
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><a asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Students</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Student Details</span></li>
+            </ul>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-main rounded-pill py-9">
+            <i class="ph ph-arrow-left me-2"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row gy-4">
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card h-100 border border-gray-100 rounded-12 overflow-hidden">
+
+                <div class="card-body p-0">
+                    <div class="p-20 pb-0">
+                        <div class="rounded-12 overflow-hidden position-relative bg-main-50 d-flex justify-content-center align-items-center border border-gray-100"
+                             style="height: 300px;">
+
+                            <img src="@(string.IsNullOrEmpty(Model.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : Model.ImgUrl)"
+                                 alt="Student Image"
+                                 class="w-100 h-100 object-fit-cover">
+                        </div>
+                    </div>
+
+                    <div class="p-24 text-center">
+                        <h4 class="mb-4 text-heading fw-bold">@Model.FullName</h4>
+                        <span class="text-gray-500 text-15">Student Account</span>
+
+                        <div class="mt-16 flex-center">
+                            @if (Model.IsActive)
+                            {
+                                <span class="py-6 px-24 bg-success-50 text-success-600 rounded-pill text-14 fw-semibold border border-success-100 flex-align gap-8">
+                                    <i class="ph-fill ph-check-circle text-lg"></i> Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="py-6 px-24 bg-danger-50 text-danger-600 rounded-pill text-14 fw-semibold border border-danger-100 flex-align gap-8">
+                                    <i class="ph-fill ph-prohibit text-lg"></i> Blocked
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="border-top border-gray-100 p-24">
+                        <h6 class="text-lg mb-16 fw-semibold">Contact Information</h6>
+
+                        <ul class="list-unstyled mb-0">
+                            <li class="flex-align gap-12 mb-16">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-envelope"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Email Address</span>
+                                    <span class="text-heading fw-medium text-15 text-break">@Model.Email</span>
+                                </div>
+                            </li>
+                            <li class="flex-align gap-12 mb-16">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-phone"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Phone Number</span>
+                                    <span class="text-heading fw-medium text-15">@Model.PhoneNumber</span>
+                                </div>
+                            </li>
+                            <li class="flex-align gap-12">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-map-pin"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Location</span>
+                                    <span class="text-heading fw-medium text-15">@Model.Country</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="p-24 pt-0">
+                        <form asp-action="ToggleStatus" asp-controller="Admin_Student" method="post" asp-route-id="@Model.Id">
+                            @if (Model.IsActive)
+                            {
+                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill py-11 fw-semibold hover-scale-1" onclick="return confirm('Block this user?');">
+                                    <i class="ph ph-prohibit me-2"></i> Block Student
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-success w-100 rounded-pill py-11 fw-semibold hover-scale-1" onclick="return confirm('Activate this user?');">
+                                    <i class="ph ph-check-circle me-2"></i> Unblock Student
+                                </button>
+                            }
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-7">
+
+            <div class="row gy-4 mb-24">
+                <div class="col-sm-6">
+                    <div class="card p-20 rounded-12 border border-gray-100 hover-border-main-600 transition-2 h-100">
+                        <div class="flex-align gap-20">
+                            <span class="w-60 h-60 rounded-circle bg-main-50 text-main-600 flex-center text-3xl flex-shrink-0">
+                                <i class="ph-fill ph-book-open"></i>
+                            </span>
+                            <div>
+                                <h3 class="mb-4">@Model.EnrolledCourses.Count</h3>
+                                <span class="text-gray-500 text-15">Enrolled Courses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card p-20 rounded-12 border border-gray-100 hover-border-warning-600 transition-2 h-100">
+                        <div class="flex-align gap-20">
+                            <span class="w-60 h-60 rounded-circle bg-warning-50 text-warning-600 flex-center text-3xl flex-shrink-0">
+                                <i class="ph-fill ph-certificate"></i>
+                            </span>
+                            <div>
+                                <h3 class="mb-4">0</h3> <span class="text-gray-500 text-15">Certificates Earned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border border-gray-100 rounded-12 overflow-hidden">
+                <div class="card-header border-bottom border-gray-100 py-16 px-24">
+                    <h5 class="mb-0">Enrolled Courses List</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.EnrolledCourses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium">Course Name</th>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium text-center">Progress</th>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.EnrolledCourses)
+                                    {
+                                        <tr>
+                                            <td class="px-24 py-16 align-middle">
+                                                <div class="flex-align gap-12">
+                                                    <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                                        <i class="ph-fill ph-video-camera"></i>
+                                                    </span>
+                                                    <span class="h6 mb-0 text-heading text-15 fw-semibold">@course.CourseName</span>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-24 py-16 align-middle" style="min-width: 150px;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress w-100 h-6 bg-gray-100 rounded-pill">
+                                                        <div class="progress-bar bg-main-600 rounded-pill" role="progressbar"
+                                                             style="width: @course.Progress%"
+                                                             aria-valuenow="@course.Progress" aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-13 text-gray-500 fw-medium">@course.Progress%</span>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-24 py-16 align-middle text-end">
+                                                @if (course.Status == "Completed")
+                                                {
+                                                    <span class="text-13 py-4 px-12 bg-success-50 text-success-600 rounded-pill fw-medium border border-success-100">Completed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-13 py-4 px-12 bg-info-50 text-info-600 rounded-pill fw-medium border border-info-100">In Progress</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-40">
+                            <div class="w-80 h-80 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-4xl mb-16">
+                                <i class="ph ph-books"></i>
+                            </div>
+                            <h6 class="text-gray-400 fw-medium">This student hasn't enrolled in any courses yet.</h6>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

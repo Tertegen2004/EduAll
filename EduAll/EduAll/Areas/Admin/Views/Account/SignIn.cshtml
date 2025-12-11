@@ -1,0 +1,94 @@
+﻿@model SignIn_vm
+
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "_main";
+}
+<section class="auth d-flex">
+
+    <div class="auth-left bg-main-50 flex-center p-24">
+        <img src="/Admin/assets/images/thumbs/auth-img1.png" alt="Login Image">
+    </div>
+
+    <div class="auth-right py-40 px-24 flex-center flex-column">
+        <div class="auth-right__inner mx-auto w-100">
+
+            <a asp-controller="Home" asp-action="Index" class="auth-right__logo">
+                <img src="/Admin/assets/images/logo/logo.png" alt="Logo">
+            </a>
+
+            <h2 class="mb-8">Welcome Back! 👋</h2>
+            <p class="text-gray-600 text-15 mb-32">Please sign in to your account and start the adventure</p>
+
+            <form asp-action="Signin" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-24">
+                    <label asp-for="Email" class="form-label mb-8 h6">Email</label>
+                    <div class="position-relative">
+                        <input asp-for="Email" class="form-control py-11 ps-40" placeholder="Type your email">
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex">
+                            <i class="ph ph-user"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="mb-24">
+                    <label asp-for="Password" class="form-label mb-8 h6">Password</label>
+                    <div class="position-relative">
+                        <input asp-for="Password" type="password" class="form-control py-11 ps-40 password-input" placeholder="Enter Password">
+
+                        <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y text-gray-600 cursor-pointer">
+                            <i class="ph ph-eye-slash" id="toggleIcon"></i>
+                        </span>
+
+                        <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex">
+                            <i class="ph ph-lock"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="mb-32 flex-between flex-wrap gap-8">
+                    <div class="form-check mb-0 flex-shrink-0">
+                        <input asp-for="RememberMe" class="form-check-input flex-shrink-0 rounded-4" type="checkbox">
+                        <label asp-for="RememberMe" class="form-check-label text-15 flex-grow-1">Remember Me</label>
+                    </div>
+                    <a asp-action="ForgotPassword" class="text-main-600 hover-text-decoration-underline text-15 fw-medium">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-main rounded-pill w-100">Sign In</button>
+
+                <p class="mt-32 text-gray-600 text-center">
+                    New on our platform?
+                    <a asp-action="Register" class="text-main-600 hover-text-decoration-underline">Create an account</a>
+                </p>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // كود إظهار وإخفاء كلمة المرور
+            $(".toggle-password").click(function () {
+                var input = $(".password-input");
+                var icon = $("#toggleIcon");
+
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text");
+                    icon.removeClass("ph-eye-slash").addClass("ph-eye");
+                } else {
+                    input.attr("type", "password");
+                    icon.removeClass("ph-eye").addClass("ph-eye-slash");
+                }
+            });
+        });
+    </script>
+}

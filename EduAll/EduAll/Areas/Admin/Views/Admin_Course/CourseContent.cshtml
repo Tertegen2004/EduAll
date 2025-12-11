@@ -1,0 +1,513 @@
+﻿@using EduAll.Domain
+@model Course
+
+@{
+    ViewData["Title"] = "Manage Course Content";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Manage Content</span></li>
+            </ul>
+        </div>
+        <div class="flex-align justify-content-end gap-8">
+            <button type="button" class="btn btn-main rounded-pill py-9 disabled">Publish Course</button>
+        </div>
+    </div>
+
+    <ul class="step-list mb-24">
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex">
+                <i class="ph-bold ph-check"></i>
+            </span>
+            Course Details
+            <span class="line position-relative"></span>
+        </li>
+
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 active">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Upload Videos
+            <span class="line position-relative"></span>
+        </li>
+
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Create Quiz
+            <span class="line position-relative"></span>
+        </li>
+
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex">
+                <i class="ph ph-circle"></i>
+            </span>
+            Publish Course
+            <span class="line position-relative"></span>
+        </li>
+    </ul>
+
+    <div class="card">
+        <div class="card-header border-bottom border-gray-100 flex-between gap-8">
+            <h5 class="mb-0">Create Section For Course: @Model.Title</h5>
+            
+            <button type="button" class="btn btn-main rounded-pill py-9" data-bs-toggle="modal" data-bs-target="#addSectionModal">
+                <i class="ph ph-plus me-2"></i> Add New Section
+            </button>
+        </div>
+        
+        <div class="card-body">
+            
+            @if (!Model.Sections.Any())
+            {
+                <div class="text-center py-5">
+                    <img src="~/Admin/assets/images/icons/video-camera.png" alt="" class="mb-3" style="opacity: 0.5">
+                    <h6 class="text-gray-400">No sections yet. Start by adding a section!</h6>
+                </div>
+            }
+
+            <div class="accordion" id="courseContentAccordion">
+                @foreach (var sec in Model.Sections.OrderBy(s => s.Order))
+                {
+                    <div class="accordion-item border mb-3 rounded-12 overflow-hidden">
+
+                        <div class="accordion-header d-flex align-items-center bg-main-50">
+                            <button class="accordion-button collapsed d-flex align-items-center bg-main-50 shadow-none justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#sec-@sec.Id">
+
+                                <span class="fw-bold text-heading">@sec.Title</span>
+
+                            </button>
+                            <div class="m-10">
+                                <button class="text-gray-600 text-2xl d-flex rounded-4 p-2 hover-bg-gray-200 transition-1" type="button" data-bs-toggle="dropdown">
+                                    <i class="ph-fill ph-dots-three-outline"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu--md border-0 bg-transparent p-0">
+                                    <div class="card border border-gray-100 rounded-12 box-shadow-custom">
+                                        <div class="card-body p-12">
+                                            <ul class="list-unstyled mb-0">
+                                                <li class="mb-2">
+                                                    <button type="button"
+                                                            onclick="openEditSectionModal('@sec.Id', '@sec.Title')"
+                                                            data-bs-toggle="modal" data-bs-target="#editSectionModal"
+                                                            class="w-100 p-4 d-flex align-items-center gap-2 py-2 px-3 hover-bg-gray-50 rounded text-gray-600 text-sm border-0 bg-transparent">
+                                                        <i class="ph ph-pencil-simple"></i> Edit
+                                                    </button>
+                                                </li>
+
+                                                <li class="mt-2">
+                                                    <form asp-action="DeleteSection" method="post"
+                                                          asp-route-sectionId="@sec.Id"
+                                                          asp-route-courseId="@Model.Id"
+                                                          onsubmit="return confirm('Are you sure?');">
+                                                        <button type="submit" class="w-100 p-4 d-flex align-items-center gap-2 py-2 px-3 hover-bg-danger-50 rounded text-danger-600 text-sm border-0 bg-transparent">
+                                                            <i class="ph ph-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        
+
+                       
+                        <div id="sec-@sec.Id" class="accordion-collapse collapse" data-bs-parent="#courseContentAccordion">
+                            <div class="accordion-body">
+
+                                @if (sec.Lessons != null)
+                                {
+                                    foreach (var lesson in sec.Lessons)
+                                    {
+                                        <div class="upload-card-item p-16 rounded-12 bg-white border border-gray-100 mb-20"> 
+                                            <div class="flex-between flex-wrap gap-4">
+                                                <div class="flex-align gap-10">
+                                                    <button type="button"
+                                                            onclick="playVideo('@lesson.VideoUrl')"
+                                                            class="w-40 h-40 bg-main-50 rounded-circle flex-center text-main-600 text-xl hover-bg-main-600 hover-text-white transition-1">
+                                                        <i class="ph-fill ph-play-circle"></i>
+                                                    </button>
+
+                                                    <div>
+                                                        <p class="text-15 text-gray-500 fw-medium mb-0">@lesson.Title</p>
+                                                        <p class="text-13 text-gray-400 mb-0">Video Lesson</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-align gap-8">
+                                                    <span class="text-success-600 d-flex text-xl"><i class="ph-fill ph-check-circle"></i></span>
+
+                                                    <div class="dropdown flex-shrink-0">
+                                                        <button class="text-gray-600 text-xl d-flex rounded-4" type="button" data-bs-toggle="dropdown">
+                                                            <i class="ph-fill ph-dots-three-outline"></i>
+                                                        </button>
+
+                                                        <div class="dropdown-menu dropdown-menu--md border-0 bg-transparent p-0">
+                                                            <div class="card border border-gray-100 rounded-12 box-shadow-custom">
+                                                                <div class="card-body p-12">
+                                                                    <ul class="list-unstyled mb-0">
+
+                                                                        <li class="mb-2">
+                                                                            @{
+                                                                                var videoName = !string.IsNullOrEmpty(lesson.VideoUrl)
+                                                                                ? System.IO.Path.GetFileName(lesson.VideoUrl)
+                                                                                : "";
+                                                                            }
+                                                                            <button type="button"
+                                                                                    onclick="openEditLessonModal('@lesson.Id', '@lesson.Title','@videoName')"
+                                                                                    data-bs-toggle="modal" data-bs-target="#editLessonModal"
+                                                                                    class="w-100 d-flex align-items-center gap-2 py-2 px-3 hover-bg-gray-50 rounded text-gray-600 text-sm border-0 bg-transparent">
+                                                                                <i class="ph ph-pencil-simple"></i> Edit
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <form asp-action="DeleteLesson" method="post"
+                                                                                  asp-route-lessonId="@lesson.Id"
+                                                                                  asp-route-courseId="@Model.Id">
+
+                                                                                <button type="button"
+                                                                                        onclick="deleteWithEffect(this, '.upload-card-item', 'Delete this lesson video?')"
+                                                                                        class="w-100 d-flex align-items-center gap-2 py-2 px-3 hover-bg-danger-50 rounded text-danger-600 text-sm border-0 bg-transparent">
+                                                                                    <i class="ph ph-trash"></i> Delete
+                                                                                </button>
+                                                                            </form>
+                                                                        </li>
+
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div class="flex-align justify-content-end gap-8">
+                                    <button type="button" class="btn btn-main rounded-pill py-9"onclick="setSectionId(@sec.Id)"data-bs-toggle="modal" data-bs-target="#addLessonModal">
+                                        <i class="ph ph-plus"></i> Add Lesson
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @{
+                var hasSections = Model.Sections != null && Model.Sections.Any();
+            }
+
+            <div class="flex-align justify-content-end gap-8 mt-24">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-main rounded-pill py-9">Back</a>
+                @if (hasSections)
+                {
+                    <a asp-action="CreateQuiz" asp-route-courseId="@Model.Id" class="btn btn-main rounded-pill py-9">Continue</a>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary rounded-pill py-9 disabled"
+                            data-bs-toggle="tooltip" data-bs-title="Please add at least one section first!"
+                            style="cursor: not-allowed; opacity: 0.6;">
+                        Continue
+                    </button>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade " id="addSectionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto ">
+        <form asp-action="AddSection" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h4 class="modal-title fw-bold text-heading">Add New Section</h4>
+                    <button type="button" class="btn-close text-xl" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body pt-24">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+
+                    <div class="mb-0">
+                        <label class="form-label h5 mb-16 fw-semibold text-heading">Section Title</label>
+                        <div class="position-relative">
+                            <input type="text" name="Title"
+                                   class="form-control rounded-pill py-16 px-24 text-18 fw-medium placeholder-text-md shadow-sm border-gray-100 focus-border-main-600"
+                                   placeholder="e.g. Introduction to C# Programming"
+                                   required />
+                            <span class="position-absolute top-50 end-0 translate-middle-y me-24 text-gray-400 text-xl">
+                                <i class="ph ph-pencil-simple"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 pt-24 justify-content-end">
+                    <button type="button" class="btn btn-outline-gray rounded-pill py-12 px-32 text-15" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-main rounded-pill py-12 px-48 text-15 fw-semibold">Save Section</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editSectionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="margin:0;">
+        <form asp-action="EditSection" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold">Edit Section</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-16">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="SectionId" id="editSectionId" />
+
+                    <label class="form-label fw-semibold">Section Title</label>
+                    <input type="text" name="Title" id="editSectionTitle" class="form-control rounded-pill" required />
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Update Section</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="addLessonModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <form asp-action="AddLesson" method="post" enctype="multipart/form-data">
+            <div class="modal-content rounded-16 position-absolute top-50 start-50 translate-middle ">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">Add New Lesson</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="SectionId" id="modalSectionId" /> 
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Lesson Title</label>
+                        <input type="text" name="Title" class="form-control rounded-pill" required placeholder="e.g. Installing Visual Studio" />
+                    </div>
+
+                    <div class="upload-card-item p-16 rounded-12 bg-main-50 mb-10 mt-10"> 
+                        <div class="flex-align gap-10 flex-wrap justify-content-center text-center">
+                            <span class="w-36 h-36 text-lg rounded-circle bg-white flex-center text-main-600 flex-shrink-0">
+                                <i class="ph-fill ph-video-camera"></i>
+                            </span>
+                            <div class="">
+                                <p class="text-15 text-gray-500">
+                                    Drag & drop your video, or 
+                                    <label for="videoInput" class="text-main-600 cursor-pointer fw-bold">Browse</label> 
+                                    <input type="file" name="VideoUrl" id="videoInput" accept="video/*" hidden required> 
+                                </p>
+                                <p class="text-13 text-gray-600">Mp4 format (max file size 100mb)</p>
+                                <span class="show-uploaded-video-name d-none fw-bold text-main-600" id="uploaded-video-name"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Upload & Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editLessonModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="margin:0;">
+        <form asp-action="EditLesson" method="post" enctype="multipart/form-data">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold">Edit Lesson</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-16">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="LessonId" id="editLessonId" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Lesson Title</label>
+                        <input type="text" name="Title" id="editLessonTitle" class="form-control rounded-pill" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold mt-5">Change Video <span class="text-muted fw-normal small">(Optional)</span></label>
+                        <div id="currentVideoContainer" class="mb-10 p-10 bg-gray-50 rounded border border-gray-100 d-none">
+                            <span class="text-13 text-gray-500 fw-semibold">Current Video:</span>
+                            <span id="currentVideoName" class="text-13 fw-bold text-main-600 text-break"></span>
+                        </div>
+                        <div class="upload-card-item p-12 mb-15 rounded-12 bg-main-50 border border-dashed">
+                            <div class="text-center">
+                                <p class="text-13 text-gray-500 mb-2 fw-semibold">Leave empty to keep current video</p>
+                                <input type="file" name="VideoUrl" id="editVideoInput" accept="video/*" class="form-control text-13">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Update Lesson</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="videoPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-black rounded-16 overflow-hidden">
+            <div class="modal-header border-0 position-absolute top-0 end-0 z-1">
+                <button type="button" class="btn-close btn-close-white bg-white rounded-circle p-2 opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <video id="previewVideoPlayer" class="w-100 h-100" controls autoplay style="max-height: 80vh;">
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // 1. Pass Section ID to Modal
+        function setSectionId(id) {
+            document.getElementById('modalSectionId').value = id;
+        }
+
+        // 2. Video Upload Preview Name (الكود بتاعك)
+        document.getElementById('videoInput').addEventListener('change', function(event) {
+            var uploadedVideoName = document.getElementById('uploaded-video-name');
+            var files = event.target.files;
+            
+            if (files.length > 0) {
+                var fileNames = Array.from(files).map(file => file.name).join(', ');
+                uploadedVideoName.textContent = "Selected: " + fileNames;
+                $('.show-uploaded-video-name').removeClass('d-none'); 
+            } else {
+                uploadedVideoName.textContent = '';
+                $('.show-uploaded-video-name').addClass('d-none');
+            }
+        });
+
+        function openEditSectionModal(id, title) {
+            document.getElementById('editSectionId').value = id;
+            document.getElementById('editSectionTitle').value = title;
+        }
+
+
+        // دالة فتح المودال (محدثة)
+        function openEditLessonModal(id, title, videoName) {
+            // 1. تعبئة البيانات الأساسية
+            document.getElementById('editLessonId').value = id;
+            document.getElementById('editLessonTitle').value = title;
+
+            // 2. التعامل مع اسم الفيديو
+            var nameLabel = document.getElementById('currentVideoName');
+            var container = document.getElementById('currentVideoContainer');
+
+            if (videoName && videoName !== '') {
+                nameLabel.textContent = videoName; // اعرض الاسم
+                container.classList.remove('d-none'); // اظهر الكونتينر
+            } else {
+                nameLabel.textContent = '';
+                container.classList.add('d-none'); // اخفيه لو مفيش فيديو
+            }
+
+            // 3. تفريغ حقل الملف الجديد (عشان يبدأ نضيف)
+            document.getElementById('editVideoInput').value = "";
+        }
+
+        function playVideo(videoUrl) {
+            console.log("Video URL:", videoUrl); // 1. للتأكد من الرابط في الكونسول
+
+            if (!videoUrl) {
+                alert("No video uploaded for this lesson yet.");
+                return;
+            }
+
+            var videoPlayer = document.getElementById('previewVideoPlayer');
+
+            // 2. تغيير المصدر
+            videoPlayer.src = videoUrl;
+
+            // 3. ⚠️ أهم خطوة: إجبار المشغل على تحميل المصدر الجديد
+            videoPlayer.load();
+
+            // 4. فتح المودال
+            $('#videoPreviewModal').modal('show');
+
+            // 5. التشغيل (مع معالجة خطأ الـ AutoPlay لو المتصفح منعه)
+            var playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // التشغيل بدأ بنجاح
+                })
+                    .catch(error => {
+                        console.log("Auto-play was prevented or video not found.");
+                    });
+            }
+        }
+        function deleteWithEffect(btn, targetSelector, message) {
+            // 1. عرض رسالة التأكيد
+            if (confirm(message)) {
+                var $btn = $(btn);
+                var $form = $btn.closest('form'); // الفورم المسؤول عن الحذف
+                var $target = $btn.closest(targetSelector); // العنصر اللي هيختفي (السكشن أو الدرس)
+
+                // 2. تنفيذ الأنيميشن (تلوين بالأحمر خفيف ثم اختفاء)
+                $target.css('transition', 'background 0.3s').css('background-color', '#fee2e2'); // لون أحمر فاتح
+
+                $target.fadeOut(600, function () {
+                    // 3. بعد ما الاختفاء يخلص.. ابعت الطلب للسيرفر
+                    $form.submit();
+                });
+            }
+        }
+
+        $(document).ready(function () {
+
+            // 1. الظهور: fadeIn بتظهر العنصر المخفي بنعومة
+            $(".alert").fadeIn(600);
+
+            // 2. الاختفاء: بعد 4 ثواني، اعمل slideUp (سحب لفوق واختفاء)
+            window.setTimeout(function () {
+                $(".alert").slideUp(600, function () {
+                    $(this).remove(); // امسحها من الصفحة خالص بعد ما تختفي
+                });
+            }, 4000);
+
+
+            $('#videoPreviewModal').on('hidden.bs.modal', function () {
+                var videoPlayer = document.getElementById('previewVideoPlayer');
+
+                if (videoPlayer) {
+                    videoPlayer.pause();       // 1. وقف التشغيل
+                    videoPlayer.currentTime = 0; // 2. رجعه للأول
+                    videoPlayer.src = "";      // 3. فضي الرابط (عشان يوقف تحميل البيانات)
+                    videoPlayer.load();        // 4. ريست للمشغل
+                }
+            });
+
+        });
+
+
+    </script>
+
+}

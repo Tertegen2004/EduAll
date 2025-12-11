@@ -1,0 +1,99 @@
+﻿@model List<Suggestion_vm>
+
+@{
+    ViewData["Title"] = "Student Suggestions";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Suggestions</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row gy-4">
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-lg-6">
+                    <div class="card border border-gray-100 rounded-12 h-100 hover-border-main-600 transition-2">
+
+                        <div class="card-header border-bottom border-gray-100 py-16 px-24 flex-between">
+                            <div class="flex-align gap-12">
+                                <img src="@(string.IsNullOrEmpty(item.StudentImage) ? "/Admin/assets/images/thumbs/user-img.png" : item.StudentImage)"
+                                     class="w-40 h-40 rounded-circle object-fit-cover" alt="">
+                                <div>
+                                    <h6 class="text-15 mb-0 fw-bold">@item.StudentName</h6>
+                                    <span class="text-13 text-gray-500">Course: <span class="text-main-600 fw-medium">@item.CourseName</span></span>
+                                </div>
+                            </div>
+
+                            @if (item.Status == "Pending")
+                            {
+                                <span class="badge bg-warning-50 text-warning-600 px-12 py-6 rounded-pill">Pending</span>
+                            }
+                            else if (item.Status == "Approved")
+                            {
+                                <span class="badge bg-success-50 text-success-600 px-12 py-6 rounded-pill">Approved</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-50 text-danger-600 px-12 py-6 rounded-pill">Rejected</span>
+                            }
+                        </div>
+
+                        <div class="card-body p-24">
+                            <div class="bg-main-50 p-16 rounded-8 mb-16">
+                                <p class="text-gray-600 text-15">@item.Content</p>
+                            </div>
+                            <span class="text-gray-400 text-13 d-block text-end">@item.CreatedAt.ToString("MMM dd, yyyy - hh:mm tt")</span>
+
+                            @if (item.Status == "Pending")
+                            {
+                                <form asp-action="Respond" method="post" class="mt-20">
+                                    <input type="hidden" name="id" value="@item.Id" />
+
+                                    <label class="form-label fw-semibold">Your Response</label>
+                                    <textarea name="response" class="form-control rounded-8 mb-16" rows="2" placeholder="Write a reply to the student..." required></textarea>
+
+                                    <div class="flex-align gap-10">
+                                        <button type="submit" name="status" value="Approve" class="btn btn-main rounded-pill py-9 px-20 flex-grow-1">
+                                            <i class="ph-bold ph-check me-2"></i> Approve
+                                        </button>
+                                        <button type="submit" name="status" value="Reject" class="btn btn-danger rounded-pill py-9 px-20 flex-grow-1">
+                                            <i class="ph-bold ph-x me-2"></i> Reject
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="mt-20 border-top border-gray-100 pt-16">
+                                    <h6 class="text-14 fw-bold text-main-600 mb-8">Admin Response:</h6>
+                                    <p class="text-gray-600 text-14 fst-italic">"@item.AdminResponse"</p>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="w-80 h-80 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-4xl mb-16">
+                    <i class="ph ph-chats-teardrop"></i>
+                </div>
+                <h6 class="text-gray-400">No suggestions found.</h6>
+            </div>
+        }
+    </div>
+</div>

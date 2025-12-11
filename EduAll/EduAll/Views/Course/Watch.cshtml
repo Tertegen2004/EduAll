@@ -1,0 +1,501 @@
+﻿@using EduAll.ViewModel
+@model WatchCourse_vm
+
+@{
+    ViewData["Title"] = Model.CurrentLessonTitle;
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
+<style>
+    /* تحسينات القائمة الجانبية */
+
+    .curriculum-sidebar {
+        max-height: 75vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+        /* سكرول بار مودرن */
+        .curriculum-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .curriculum-sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .curriculum-sidebar::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+            .curriculum-sidebar::-webkit-scrollbar-thumb:hover {
+                background: var(--main-600);
+            }
+
+    /* الدرس النشط */
+    .active-lesson {
+        background-color: #F0FDF4 !important; /* أخضر فاتح جداً */
+        border-left: 4px solid var(--main-600) !important;
+    }
+
+        .active-lesson .text-neutral-500 {
+            color: var(--main-600) !important;
+            font-weight: 600;
+        }
+
+        .active-lesson i {
+            color: var(--main-600);
+        }
+
+    /* تحسين كارت المدرب */
+    .instructor-card {
+        background-color: #F9FAFB;
+        border: 1px solid #E5E7EB;
+        transition: all 0.3s ease;
+    }
+
+        .instructor-card:hover {
+            border-color: var(--main-600);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+</style>
+
+<section class="course-details py-60 bg-white">
+    <div class="container-fluid px-lg-5">
+
+        <div class="mb-24 flex-between flex-wrap gap-16">
+            <a asp-action="Index" asp-controller="MyCourses" class="text-neutral-500 hover-text-main-600 fw-medium flex-align gap-8">
+                <i class="ph-bold ph-arrow-left text-xl"></i> Back to My Courses
+            </a>
+
+            <button type="button" class="btn btn-outline-main rounded-pill py-8 px-24 text-sm flex-align gap-8"
+                    data-bs-toggle="modal" data-bs-target="#suggestionModal">
+                <i class="ph-bold ph-paper-plane-tilt"></i> Report / Suggestion
+            </button>
+        </div>
+
+        <div class="row gy-4">
+
+            <div class="col-xl-9 col-lg-8">
+
+                <div class="rounded-16 overflow-hidden box-shadow-lg bg-black mb-32" style="aspect-ratio: 16/9;">
+                    @if (!string.IsNullOrEmpty(Model.CurrentVideoUrl))
+                    {
+                        <video id="player" class="w-100 h-100" playsinline controls">
+                            <source src="@Model.CurrentVideoUrl" type="video/mp4" />
+                            <source src="@Model.CurrentVideoUrl" type="video/webm" />
+                        </video>
+                    }
+                    else
+                    {
+                        <div class="flex-center flex-column h-100 text-white">
+                            <i class="ph-duotone ph-film-strip text-6xl mb-3 text-neutral-400"></i>
+                            <h5 class="text-neutral-200">Content Unavailable</h5>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-24">
+                    <h2 class="mb-0 text-neutral-900">@Model.CurrentLessonTitle</h2>
+
+                    <button id="btnMarkComplete"
+                            onclick="markAsComplete(@Model.CurrentLessonId, @Model.CourseId)"
+                            class="btn btn-outline-main rounded-pill flex-align gap-8 @(Model.Sections.SelectMany(s=>s.Lessons).FirstOrDefault(l=>l.Id == Model.CurrentLessonId)?.IsCompleted == true ? "d-none" : "")">
+                        <i class="ph-bold ph-check-circle"></i> Mark as Complete
+                    </button>
+
+                    <span id="msgCompleted" class="text-success-600 fw-bold flex-align gap-8 @(Model.Sections.SelectMany(s=>s.Lessons).FirstOrDefault(l=>l.Id == Model.CurrentLessonId)?.IsCompleted == true ? "" : "d-none")">
+                        <i class="ph-fill ph-check-circle text-xl"></i> Completed
+                    </span>
+                </div>
+
+                <div class="border-top border-neutral-100 my-32"></div>
+
+                <div class="mb-40">
+                    <h4 class="mb-24">Instructor</h4>
+                    <div class="instructor-card p-24 rounded-16 d-flex align-items-center gap-24 flex-wrap flex-md-nowrap">
+                        <div class="position-relative flex-shrink-0">
+                            <img src="@Model.InstructorImg" alt="@Model.InstructorName" class="w-80 h-80 rounded-circle cover-img border border-2 border-white shadow-sm">
+                            <span class="position-absolute bottom-0 end-0 w-20 h-20 bg-success-500 border border-white rounded-circle"></span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-4 fw-bold">@Model.InstructorName</h5>
+                            <p class="text-main-600 fw-medium text-sm mb-8">@Model.InstructorJob</p>
+                            <p class="text-neutral-500 text-sm text-line-2">Professional instructor with years of experience in the field. Dedicated to helping students achieve their goals.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-top border-neutral-100 my-32"></div>
+
+                <div class="mb-40">
+                    <h4 class="mb-16">Lesson Description</h4>
+                    <div class="text-neutral-700 bg-white p-24 rounded-16 border border-neutral-30">
+                        @if (!string.IsNullOrEmpty(Model.LessonDescription))
+                        {
+                            @Html.Raw(Model.LessonDescription)
+                        }
+                        else
+                        {
+                            <p class="mb-0 text-neutral-400 d-flex align-items-center gap-8">
+                                <i class="ph-bold ph-info"></i> No specific description provided for this lesson.
+                            </p>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-xl-3 col-lg-4">
+                <div class="curriculum-sidebar-wrapper">
+                    <div class="bg-white border border-neutral-30 rounded-16 overflow-hidden box-shadow-sm">
+
+                        <div class="p-20 bg-main-25 border-bottom border-neutral-30">
+                            <h5 class="mb-4 text-lg">Course Content</h5>
+                            <div class="flex-between">
+                                <span class="text-neutral-500 text-xs fw-medium">@Model.Sections.Count Sections</span>
+                                <span class="text-neutral-500 text-xs fw-medium">@Model.Sections.Sum(s => s.Lessons.Count) Lessons</span>
+                            </div>
+                            <div class="progress h-4 bg-neutral-200 rounded-pill mt-12">
+                                <div class="progress-bar bg-main-600 rounded-pill" role="progressbar" style="width: 35%"></div>
+                            </div>
+                        </div>
+
+                        <div class="curriculum-sidebar">
+                            <div class="accordion common-accordion style-three border-0" id="accordionCurriculum">
+
+                                @foreach (var sec in Model.Sections.Select((val, i) => new { Value = val, Index = i }))
+                                {
+                                    // السكشن مفتوح لو مش مقفول، أو لو جواه الدرس الشغال حالياً
+                                    var isActiveSection = !sec.Value.IsLocked && sec.Value.Lessons.Any(l => l.IsActive);
+
+                                    <div class="accordion-item border-bottom border-neutral-30 rounded-0 @(sec.Value.IsLocked ? "locked-section" : "")">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button py-16 px-20 text-md fw-bold text-neutral-700 @(isActiveSection ? "" : "collapsed")"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-@sec.Index"
+                                            @(sec.Value.IsLocked ? "disabled" : "")>
+                                                <div class="d-flex justify-content-between w-100 align-items-center">
+                                                    <span>@sec.Value.Title</span>
+                                                    @if (sec.Value.IsLocked)
+                                                    {
+                                                        <i class="ph-fill ph-lock-key text-neutral-400 me-3" title="Locked: Complete previous quizzes first"></i>
+                                                    }
+                                                </div>
+                                            </button>
+                                        </h2>
+
+                                        <div id="collapse-@sec.Index"
+                                             class="accordion-collapse collapse @(isActiveSection ? "show" : "")"
+                                             data-bs-parent="#accordionCurriculum">
+
+                                            <div class="accordion-body p-0">
+                                                @if (sec.Value.IsLocked)
+                                                {
+                                                    <div class="p-3 text-center text-neutral-500 bg-gray-50">
+                                                        <small><i class="ph-bold ph-lock-key me-1"></i> Pass previous quizzes to unlock.</small>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var lesson in sec.Value.Lessons)
+                                                    {
+                                                        <a asp-action="Watch" asp-route-id="@Model.CourseId" asp-route-lessonId="@lesson.Id"
+                                                           class="d-flex align-items-center gap-12 py-12 px-20 border-bottom border-neutral-30 text-neutral-500 hover-bg-main-25 transition-1 @(lesson.IsActive ? "active-lesson" : "")">
+                                                            <div class="flex-shrink-0">
+                                                                @if (lesson.IsActive)
+                                                                {
+                                                                    <i class="ph-fill ph-play-circle text-xl animate-pulse"></i>
+                                                                }
+                                                                else if (lesson.IsCompleted)
+                                                                {
+                                                                    <i class="ph-bold ph-check-circle text-success-600 text-xl"></i>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="ph-bold ph-video-camera text-lg text-neutral-400"></i>
+                                                                }
+                                                            </div>
+                                                            <div class="flex-grow-1 overflow-hidden">
+                                                                <span class="d-block text-sm text-line-1 mb-1">@lesson.Title</span>
+                                                                <span class="d-block text-xs text-neutral-400">@lesson.Duration</span>
+                                                            </div>
+                                                        </a>
+                                                    }
+
+                                                    @if (sec.Value.Quizzes != null && sec.Value.Quizzes.Any())
+                                                    {
+                                                        @foreach (var quiz in sec.Value.Quizzes)
+                                                        {
+                                                            <button onclick="openQuizModal(@quiz.Id)"
+                                                                    class="d-flex align-items-center gap-12 py-12 px-20 border-bottom border-neutral-30 text-neutral-500 hover-bg-warning-50 transition-1 w-100 text-start bg-transparent border-0">
+                                                                <div class="flex-shrink-0">
+                                                                    @if (quiz.IsCompleted)
+                                                                    {
+                                                                        <i class="ph-bold ph-check-circle text-success-600 text-lg"></i>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <i class="ph-bold ph-pencil-simple text-lg text-warning-600"></i>
+                                                                    }
+                                                                </div>
+                                                                <div class="flex-grow-1 overflow-hidden">
+                                                                    <span class="d-block text-sm fw-medium text-line-1">Quiz: @quiz.Title</span>
+                                                                    <span class="d-block text-xs text-warning-600">@(quiz.IsCompleted ? "Completed" : "Click to start")</span>
+                                                                </div>
+                                                                <i class="ph-bold ph-arrow-right text-xs"></i>
+                                                            </button>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-16 border-0">
+            <div class="modal-header border-bottom border-neutral-30">
+                <h5 class="modal-title flex-align gap-8" id="suggestionModalLabel">
+                    <i class="ph-bold ph-paper-plane-tilt text-main-600"></i> Send Suggestion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-24">
+                <p class="text-neutral-500 text-sm mb-16">Found a bug? Have a suggestion? Let the instructor know.</p>
+                <form id="suggestionForm">
+                    <div class="mb-16">
+                        <label class="fw-medium text-neutral-700 mb-8">Message</label>
+                        <textarea id="suggestionMessage" class="form-control rounded-12 bg-main-25 border-neutral-40" rows="4" placeholder="Type your message here..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top border-neutral-30">
+                <button type="button" class="btn btn-outline-gray rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" onclick="submitSuggestion()" class="btn btn-main rounded-pill">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="quizModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-16 border-0">
+            <div class="modal-header border-bottom border-neutral-30 bg-main-25">
+                <h5 class="modal-title flex-align gap-8">
+                    <i class="ph-bold ph-exam text-main-600"></i> <span id="quizTitleText">Take Quiz</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-24" id="quizModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-main-600" role="status"></div>
+                    <p class="mt-2 text-neutral-500">Loading Quiz...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script>
+        // تعريف متغيرات الكورس في النطاق العام (Global Scope) عشان تكون متاحة
+            const currentLessonId = @Model.CurrentLessonId;
+                const currentCourseId = @Model.CourseId;
+
+                document.addEventListener('DOMContentLoaded', () => {
+
+                    // 1. تعريف المشغل مرة واحدة فقط
+                    const player = new Plyr('#player', {
+                        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+                        speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
+                    });
+
+                    // 2. إضافة حدث انتهاء الفيديو
+                    player.on('ended', function(event) {
+                        console.log("🎬 Video ended! Marking as complete...");
+                        markAsComplete(currentLessonId, currentCourseId);
+                    });
+
+                    // 3. التعامل مع الأخطاء (اختياري)
+                    player.on('error', function(event) {
+                        console.error("Video Error:", event);
+                    });
+                });
+
+                // دالة الحفظ (خارج الـ Event Listener عشان نقدر نناديها من الزرار كمان)
+                function markAsComplete(lessonId, courseId) {
+
+                    var btn = $('#btnMarkComplete');
+
+                    // نمنع التكرار لو الزرار مخفي أصلاً (معناها الدرس مكتمل)
+                    if (btn.hasClass('d-none')) return;
+
+                    if(btn.length > 0) {
+                        btn.html('<i class="ph ph-spinner ph-spin"></i> Saving...');
+                        btn.prop('disabled', true); // نمنع الضغط المتكرر
+                    }
+
+                    $.ajax({
+                        url: '/Course/MarkLessonComplete',
+                        type: 'POST',
+                        data: { lessonId: lessonId, courseId: courseId },
+                        success: function (res) {
+                            if (res.success) {
+                                console.log("✅ Lesson marked as complete.");
+
+                                // 1. تحديث واجهة الزرار
+                                if(btn.length > 0) {
+                                    btn.addClass('d-none');
+                                    $('#msgCompleted').removeClass('d-none');
+                                }
+
+                                // 2. تلوين الدرس في القائمة الجانبية
+                                var sidebarLink = $(`a[href*="lessonId=${lessonId}"]`);
+                                var sidebarIcon = sidebarLink.find('.flex-shrink-0 i');
+
+                                // نشيل أي أيقونة قديمة ونحط الصح الخضراء
+                                sidebarIcon.attr('class', 'ph-bold ph-check-circle text-success-600 text-xl');
+                            }
+                        },
+                        error: function(err) {
+                            console.error("❌ Error marking lesson complete:", err);
+                            if(btn.length > 0) {
+                                btn.html('<i class="ph-bold ph-check-circle"></i> Mark as Complete');
+                                btn.prop('disabled', false);
+                            }
+                        }
+                    });
+                }
+
+
+        function submitSuggestion() {
+            var message = $('#suggestionMessage').val();
+
+            if (!message.trim()) {
+                alert("Please enter a message.");
+                return;
+            }
+
+            // تجهيز الزرار
+            var submitBtn = $('#suggestionModal .btn-main');
+            submitBtn.html('<i class="ph ph-spinner ph-spin"></i> Sending...');
+            submitBtn.prop('disabled', true);
+
+            $.ajax({
+                url: '/Course/SendReport', // تأكد إن الاسم هنا زي اسم الاكشن في الكنترولر
+                type: 'POST',
+                data: {
+                    courseId: currentCourseId, // المتغير ده احنا معرفينه فوق في الفيو
+                    message: message
+                },
+                success: function (res) {
+                    if (res.success) {
+                        alert(res.message);
+                        $('#suggestionMessage').val(''); // فضي النص
+                        $('#suggestionModal').modal('hide'); // اقفل المودال
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong.");
+                },
+                complete: function() {
+                    // رجع الزرار لأصله
+                    submitBtn.html('Send Message');
+                    submitBtn.prop('disabled', false);
+                }
+            });
+        }
+
+        // ================== دوال الكويز (Quiz Functions) ==================
+
+        // 1. فتح المودال وجلب الكويز
+        function openQuizModal(quizId) {
+            var myModal = new bootstrap.Modal(document.getElementById('quizModal'));
+            myModal.show();
+
+            // إعادة تعيين المحتوى لوضع التحميل
+            $('#quizModalBody').html(`
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-main-600" role="status"></div>
+                        <p class="mt-2 text-neutral-500">Loading Quiz...</p>
+                    </div>
+                `);
+
+            // جلب الـ Partial View من الكنترولر
+            $.ajax({
+                url: '/Quiz/LoadQuiz',
+                type: 'GET',
+                data: { quizId: quizId, courseId: currentCourseId },
+                success: function (res) {
+                    $('#quizModalBody').html(res);
+                },
+                error: function () {
+                    $('#quizModalBody').html('<div class="text-center text-danger py-5"><i class="ph-bold ph-warning text-4xl mb-2"></i><p>Failed to load quiz. Please try again.</p></div>');
+                }
+            });
+        }
+
+        // 2. إرسال الإجابات وتصحيحها
+        function submitQuizAnswer(e) {
+            e.preventDefault(); // منع الريفريش
+
+            var form = $('#quizForm');
+            var submitBtn = form.find('button[type="submit"]');
+
+            // تغيير الزرار لحالة التحميل
+            var originalBtnText = submitBtn.html();
+            submitBtn.html('<i class="ph ph-spinner ph-spin"></i> Grading...').prop('disabled', true);
+
+            $.ajax({
+                url: '/Quiz/SubmitQuiz',
+                type: 'POST',
+                data: form.serialize(), // بيجمع كل الإجابات أوتوماتيك
+                success: function (res) {
+                    if (res.success) {
+                        // إخفاء الأسئلة وإظهار النتيجة
+                        form.addClass('d-none');
+                        var resultDiv = $('#quizResult');
+                        resultDiv.removeClass('d-none');
+
+                        if (res.passed) {
+                            resultDiv.find('.result-icon').html('<i class="ph-fill ph-trophy text-success-600 text-6xl mb-3"></i>');
+                            resultDiv.find('.result-title').text('Congratulations! You Passed').addClass('text-success-600');
+                        } else {
+                            resultDiv.find('.result-icon').html('<i class="ph-fill ph-smiley-sad text-danger-600 text-6xl mb-3"></i>');
+                            resultDiv.find('.result-title').text('Hard Luck! You Failed').addClass('text-danger-600');
+                        }
+
+                        resultDiv.find('.result-score').html(`Your Score: <strong>${res.score}</strong> / ${res.total}`);
+                    } else {
+                        alert("Error: " + res.message);
+                        submitBtn.html(originalBtnText).prop('disabled', false);
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong. Please check your connection.");
+                    submitBtn.html(originalBtnText).prop('disabled', false);
+                }
+            });
+        }
+    </script>
+}

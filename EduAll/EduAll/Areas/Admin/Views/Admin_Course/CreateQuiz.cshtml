@@ -1,0 +1,429 @@
+﻿@model Course
+
+@{
+    ViewData["Title"] = "Create Quiz";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-action="Index" asp-controller="Home" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Create Quiz</span></li>
+            </ul>
+        </div>
+
+        <div class="flex-align justify-content-end gap-8">
+            <button type="button"
+                    class="btn btn-main rounded-pill py-9"
+                    disabled>
+                Publish Course
+            </button>
+        </div>
+    </div>
+
+    <ul class="step-list mb-24">
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex"><i class="ph-bold ph-check"></i></span> 
+            Course Details <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex"><i class="ph-bold ph-check"></i></span> 
+            Upload Videos <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 active">
+            <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span> 
+            Create Quiz <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6">
+            <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span> 
+            Publish Course <span class="line position-relative"></span>
+        </li>
+    </ul>
+
+    <div class="card">
+        <div class="card-header border-bottom border-gray-100 flex-between gap-8">
+            <h5 class="mb-0">Quizzes for Course: @Model.Title</h5>
+            <button type="button" class="btn btn-main rounded-pill py-9" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+                <i class="ph ph-plus me-2"></i> Create New Quiz
+            </button>
+        </div>
+
+        <div class="card-body">
+            
+            @if (!Model.Sections.Any(s => s.Quizzes.Any()))
+            {
+                <div class="text-center py-5">
+                    <h6 class="text-gray-400">No quizzes created yet. Add a quiz to a section!</h6>
+                </div>
+            }
+            else 
+            {
+                <div class="accordion" id="quizAccordion">
+                    @foreach (var sec in Model.Sections)
+                    {
+                        @if (sec.Quizzes.Any())
+                        {
+                            <div class="mb-4">
+                                <h6 class="text-main-600 bg-main-50 p-20 rounded mb-2">Section: @sec.Title</h6>
+
+                                @foreach (var quiz in sec.Quizzes)
+                                {
+                                    <div class="accordion-item border mb-3 rounded-12 overflow-visible">
+
+                                        <div class="accordion-header d-flex align-items-center bg-main-50">
+                                            <button class="accordion-button collapsed d-flex align-items-center bg-main-50 shadow-none justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#quiz-@quiz.Id">
+
+                                                <span class="fw-bold text-heading text-end">@quiz.Title</span>
+
+                                            </button>
+                                                <span class="badge bg-gray-100 text-gray-600 p-10">Pass: @quiz.PassingScore</span>
+                                            <div class="m-10">
+                                                <button class="text-gray-600 text-2xl d-flex rounded-4 p-2 hover-bg-gray-200 transition-1" type="button" data-bs-toggle="dropdown">
+                                                    <i class="ph-fill ph-dots-three-outline"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu--md border-0 bg-transparent p-0">
+                                                    <div class="card border border-gray-100 rounded-12 box-shadow-custom">
+                                                        <div class="card-body p-12">
+                                                            <ul class="list-unstyled mb-0">
+                                                                <li class="mb-2">
+                                                                    <button type="button"
+                                                                            onclick="openEditQuizModal('@quiz.Id', '@quiz.Title', '@quiz.PassingScore')"
+                                                                            data-bs-toggle="modal" data-bs-target="#editQuizModal"
+                                                                            class="w-100 p-4 d-flex align-items-center gap-2 py-2 px-3 hover-bg-gray-50 rounded text-gray-600 text-sm border-0 bg-transparent">
+                                                                        <i class="ph ph-pencil-simple"></i> Edit
+                                                                    </button>
+                                                                </li>
+
+                                                                <li class="mt-2">
+                                                                    <form asp-action="DeleteQuiz" method="post"
+                                                                          asp-route-quizId="@quiz.Id"
+                                                                          asp-route-courseId="@Model.Id"
+                                                                          onsubmit="return confirm('Are you sure? All questions inside will be deleted!');">
+                                                                        <button type="submit" class="w-100 p-4 d-flex align-items-center gap-2 py-2 px-3 hover-bg-danger-50 rounded text-danger-600 text-sm border-0 bg-transparent">
+                                                                            <i class="ph ph-trash"></i> Delete
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div id="quiz-@quiz.Id" class="accordion-collapse collapse" data-bs-parent="#quizAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group mb-3">
+                                                    @foreach(var q in quiz.Questions)
+                                                    {
+                                                        <li class="d-flex justify-content-between align-items-start mb-2">
+
+                                                            <div>
+                                                                <h6 class="fw-bold mb-1">Q: @q.Text</h6>
+                                                            </div>
+                                                            @{
+                                                                // 1. تحديد رقم الإجابة الصحيحة
+                                                                // بنشوف انهي اختيار الـ IsCorrect بتاعه true وناخد الـ Index بتاعه
+                                                                var correctIndex = q.Options.FindIndex(o => o.IsCorrect);
+
+                                                                // 2. تحويل الاختيارات لقائمة نصوص عشان نعرضها بسهولة
+                                                                var optionsList = q.Options.Select(o => o.Option).ToList();
+                                                            }
+
+                                                            <div class="dropdown ms-2 d-flex align-items-center">
+                                                                <span class="badge bg-primary-50 text-gray-600 p-5 m-5">@q.Score Points</span>
+                                                                <button class="text-gray-600 text-xl d-flex rounded-4 p-2 hover-bg-white transition-1 border-0 bg-transparent"
+                                                                        type="button"
+                                                                        data-bs-toggle="dropdown"
+                                                                        aria-expanded="false">
+                                                                    <i class="ph-fill ph-dots-three-outline"></i>
+                                                                </button>
+
+                                                                <div class="dropdown-menu dropdown-menu-end border-0 bg-transparent p-0">
+                                                                    <div class="card border border-gray-100 rounded-12 box-shadow-custom">
+                                                                        <div class="card-body p-12">
+                                                                            <ul class="list-unstyled mb-0">
+
+                                                                                <li class="mb-2">
+                                                                                    <button type="button"
+                                                                                            class="w-100 d-flex align-items-center gap-2 py-2 px-3 hover-bg-gray-50 rounded text-gray-600 text-sm border-0 bg-transparent edit-question-btn"
+                                                                                            data-bs-toggle="modal"
+                                                                                            data-bs-target="#editQuestionModal"
+                                                                                            data-id="@q.Id"
+                                                                                            data-text="@q.Text"
+                                                                                            data-score="@q.Score"
+                                                                                            data-correct-index="@correctIndex"
+                                                                                            data-opt-0="@optionsList.ElementAtOrDefault(0)"
+                                                                                            data-opt-1="@optionsList.ElementAtOrDefault(1)"
+                                                                                            data-opt-2="@optionsList.ElementAtOrDefault(2)"
+                                                                                            data-opt-3="@optionsList.ElementAtOrDefault(3)">
+
+                                                                                        <i class="ph ph-pencil-simple"></i> Edit
+                                                                                    </button>
+                                                                                </li>
+
+                                                                                <li>
+                                                                                    <form asp-action="DeleteQuestion" method="post"
+                                                                                          asp-route-questionId="@q.Id"
+                                                                                          asp-route-courseId="@Model.Id"
+                                                                                          onsubmit="return confirm('Are you sure? This will delete the question and its choices.');">
+                                                                                        <button type="submit" class="w-100 d-flex align-items-center gap-2 py-2 px-3 hover-bg-danger-50 rounded text-danger-600 text-sm border-0 bg-transparent">
+                                                                                            <i class="ph ph-trash"></i> Delete
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </li>
+
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </li>
+                                                        <hr />
+                                                    }
+                                                </ul>
+                                                
+                                                <div class="text-end">
+                                                    <button class="btn btn-sm btn-outline-main rounded-pill" 
+                                                            onclick="setQuizId(@quiz.Id)"
+                                                            data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                                                        + Add Question
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+            <div class="flex-align justify-content-end gap-8 mt-24">
+                <a asp-action="CourseContent" asp-route-courseId="@Model.Id" class="btn btn-outline-main rounded-pill py-9">Back</a>
+                <a asp-action="PublishCourse" asp-route-courseId="@Model.Id" class="btn btn-main rounded-pill py-9">Continue</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addQuizModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+        <form asp-action="AddQuiz" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header"><h5 class="modal-title">Create Quiz</h5></div>
+                <div class="modal-body">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    
+                    <label class="form-label">Select Section</label>
+                    <select name="SectionId" class="form-select mb-3" required>
+                        @foreach (var s in Model.Sections)
+                        {
+                            <option value="@s.Id">@s.Title</option>
+                        }
+                    </select>
+
+                    <label class="form-label">Quiz Title</label>
+                    <input type="text" name="Title" class="form-control mb-3" required />
+
+                    <label class="form-label">Passing Score</label>
+                    <input type="number" name="PassingScore" class="form-control" required value="50" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Save Quiz</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editQuizModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+        <form asp-action="EditQuiz" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title fw-bold">Edit Quiz</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="QuizId" id="editQuizId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Quiz Title</label>
+                        <input type="text" name="Title" id="editQuizTitle" class="form-control rounded-pill" required />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Passing Score</label>
+                            <input type="number" name="PassingScore" id="editQuizScore" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Update Quiz</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="addQuestionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+        <form asp-action="AddQuestion" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header"><h5 class="modal-title">Add Question</h5></div>
+                <div class="modal-body">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="QuizId" id="modalQuizId" />
+
+                    <label class="form-label">Question Text</label>
+                    <input type="text" name="Text" class="form-control mb-3" required />
+
+                    <label class="form-label">Score</label>
+                    <input type="number" name="Score" class="form-control mb-3" value="1" />
+                    
+                    <hr />
+                    <h6>Options (Mark the correct one)</h6>
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="input-group mb-2">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="radio" name="CorrectIndex" value="@i" @(i==0?"checked":"")>
+                            </div>
+                            <input type="text" name="Options[@i]" class="form-control" placeholder="Option @(i+1)" required>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Save Question</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editQuestionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+        <form asp-action="EditQuestion" method="post">
+            <div class="modal-content position-absolute top-50 start-50 translate-middle rounded-16 p-24">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title fw-bold">Edit Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <input type="hidden" name="CourseId" value="@Model.Id" />
+                    <input type="hidden" name="QuestionId" id="editQuestionId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Question Text</label>
+                        <input type="text" name="Text" id="editQuestionText" class="form-control rounded-pill" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Score</label>
+                        <input type="number" name="Score" id="editQuestionScore" class="form-control rounded-pill" required />
+                    </div>
+
+                    <hr />
+
+                    <h6>Edit Options (Mark correct one)</h6>
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="input-group mb-2">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0 edit-radio" type="radio" name="CorrectIndex" value="@i" id="radio-@i">
+                            </div>
+                            <input type="text" name="Options[@i]" id="opt-@i" class="form-control" placeholder="Option @(i+1)" required>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Update Question & Choices</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+
+        $(document).ready(function () {
+
+            // لما نضغط على أي زرار واخد الكلاس ده
+            $('.edit-question-btn').click(function () {
+                var btn = $(this); // الزرار اللي انضغط
+
+                // 1. ملء البيانات الأساسية
+                $('#editQuestionId').val(btn.data('id'));
+                $('#editQuestionText').val(btn.data('text'));
+                $('#editQuestionScore').val(btn.data('score'));
+
+                // 2. ملء الاختيارات (Loop بسيط)
+                for (var i = 0; i < 4; i++) {
+                    var optText = btn.data('opt-' + i); // هات النص من الزرار
+                    $('#opt-' + i).val(optText); // حطه في الانبوت
+                }
+
+                // 3. تحديد الإجابة الصح
+                var correctIndex = btn.data('correct-index');
+                // علم على الراديو اللي قيمته بتساوي الاندكس الصح
+                $('input[name="CorrectIndex"][value="' + correctIndex + '"]').prop('checked', true);
+            });
+
+        });
+        function setQuizId(id) {
+            document.getElementById('modalQuizId').value = id;
+        }
+
+
+        function openEditQuizModal(id, title, score, time) {
+                document.getElementById('editQuizId').value = id;
+                document.getElementById('editQuizTitle').value = title;
+                document.getElementById('editQuizScore').value = score;
+        }
+
+
+        function deleteWithEffect(btn, targetSelector, message) {
+                    // 1. عرض رسالة التأكيد
+              if (confirm(message)) {
+                  var $btn = $(btn);
+                  var $form = $btn.closest('form'); // الفورم المسؤول عن الحذف
+                  var $target = $btn.closest(targetSelector); // العنصر اللي هيختفي (السكشن أو الدرس)
+
+                  // 2. تنفيذ الأنيميشن (تلوين بالأحمر خفيف ثم اختفاء)
+                  $target.css('transition', 'background 0.3s').css('background-color', '#fee2e2'); // لون أحمر فاتح
+
+                  $target.fadeOut(600, function () {
+                      // 3. بعد ما الاختفاء يخلص.. ابعت الطلب للسيرفر
+                      $form.submit();
+                  });
+              }
+        }
+
+        $(document).ready(function () {
+
+             // 1. الظهور: fadeIn بتظهر العنصر المخفي بنعومة
+             $(".alert").fadeIn(600);
+
+             // 2. الاختفاء: بعد 4 ثواني، اعمل slideUp (سحب لفوق واختفاء)
+             window.setTimeout(function () {
+                 $(".alert").slideUp(600, function () {
+                     $(this).remove(); // امسحها من الصفحة خالص بعد ما تختفي
+                 });
+             }, 4000);
+
+        });
+
+
+    </script>
+}

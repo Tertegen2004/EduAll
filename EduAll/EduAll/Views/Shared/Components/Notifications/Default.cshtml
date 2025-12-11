@@ -1,0 +1,70 @@
+﻿@using EduAll.ViewModel
+@model List<Notification_vm>
+
+<div class="dropdown">
+    <button class="dropdown-btn shaking-animation text-gray-500 w-40 h-40 bg-main-50 hover-bg-main-100 transition-2 rounded-circle text-xl flex-center position-relative"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="ph ph-bell"></i>
+        @if (Model.Any())
+        {
+            <span class="alarm-notify position-absolute top-0 end-0 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+        }
+    </button>
+
+    <div class="dropdown-menu dropdown-menu--lg border-0 bg-transparent p-0" style="width: 340px;">
+        <div class="card border border-gray-100 rounded-12 box-shadow-custom p-0 overflow-hidden">
+
+            <div class="py-12 px-24 bg-main-600 flex-between">
+                <h5 class="text-lg fw-semibold text-white mb-0">Notifications</h5>
+                @if (Model.Any())
+                {
+                    <span class="bg-white text-main-600 rounded-pill px-8 py-2 text-xs fw-bold">@Model.Count New</span>
+                }
+            </div>
+
+            <div class="p-0 max-h-270 overflow-y-auto scroll-sm">
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <div class="d-flex align-items-start gap-12 p-16 border-bottom border-gray-100 hover-bg-gray-50 transition-1 cursor-pointer"
+                             onclick="window.location.href='@item.Link'">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="w-40 h-40 rounded-circle bg-warning-50 text-warning-600 flex-center flex-shrink-0">
+                                    <i class="ph-fill ph-clock-countdown text-xl"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="w-40 h-40 rounded-circle flex-center flex-shrink-0 @(item.IsApproved ? "bg-success-50 text-success-600" : "bg-danger-50 text-danger-600")">
+                                    <i class="ph-fill @(item.IsApproved ? "ph-check-circle" : "ph-x-circle") text-xl"></i>
+                                </div>
+                            }
+
+                            <div class="flex-grow-1">
+                                <p class="fw-bold text-14 text-gray-900 mb-1">
+                                    @item.Message
+                                </p>
+                                <p class="text-12 text-gray-500 mb-1 text-line-2">@item.Detail</p>
+                                <span class="text-11 text-gray-400 d-block">@item.Time.ToString("MMM dd, hh:mm tt")</span>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="ph ph-bell-slash text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 text-sm">No new notifications.</p>
+                    </div>
+                }
+            </div>
+
+            <a href="#" class="d-block py-12 text-center text-main-600 fw-bold text-sm border-top border-gray-100 hover-bg-gray-50">
+                View All Activity
+            </a>
+
+        </div>
+    </div>
+</div>

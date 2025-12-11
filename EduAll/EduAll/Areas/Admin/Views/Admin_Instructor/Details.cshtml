@@ -1,0 +1,206 @@
+﻿
+@model InstructorDetails_vm
+
+@{
+    ViewData["Title"] = "Instructor Details";
+}
+
+<div class="dashboard-body">
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><a asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Instructors</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Details</span></li>
+            </ul>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-main rounded-pill py-9">
+            <i class="ph ph-arrow-left me-2"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row gy-4">
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card h-100 border border-gray-100 rounded-12 overflow-hidden">
+
+                <div class="card-body p-0">
+                    <div class="p-20 pb-0">
+                        <div class="rounded-12 overflow-hidden position-relative bg-main-50 d-flex justify-content-center align-items-center border border-gray-100"
+                             style="height: 300px;">
+
+                            <img src="@(string.IsNullOrEmpty(Model.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : Model.ImgUrl)"
+                                 alt="Instructor Image"
+                                 class="w-100 h-100 object-fit-cover">
+                        </div>
+                    </div>
+
+                    <div class="p-24 text-center">
+                        <h4 class="mb-1 text-heading fw-bold">@Model.FullName</h4>
+                        <span class="text-main-600 bg-main-50 px-12 py-4 rounded-pill text-13 fw-medium">@Model.JobTitle</span>
+
+                        <div class="mt-16 flex-center">
+                            @if (Model.IsActive)
+                            {
+                                <span class="py-6 px-24 bg-success-50 text-success-600 rounded-pill text-14 fw-semibold border border-success-100 flex-align gap-8">
+                                    <i class="ph-fill ph-check-circle text-lg"></i> Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="py-6 px-24 bg-danger-50 text-danger-600 rounded-pill text-14 fw-semibold border border-danger-100 flex-align gap-8">
+                                    <i class="ph-fill ph-prohibit text-lg"></i> Blocked
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="border-top border-gray-100 p-24">
+                        <h6 class="text-lg mb-16 fw-semibold">Contact Information</h6>
+
+                        <ul class="list-unstyled mb-0">
+                            <li class="flex-align gap-12 mb-16">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-envelope"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Email Address</span>
+                                    <span class="text-heading fw-medium text-15 text-break">@Model.Email</span>
+                                </div>
+                            </li>
+                            <li class="flex-align gap-12 mb-16">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-phone"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Phone Number</span>
+                                    <span class="text-heading fw-medium text-15">@Model.PhoneNumber</span>
+                                </div>
+                            </li>
+                            <li class="flex-align gap-12">
+                                <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                    <i class="ph ph-map-pin"></i>
+                                </span>
+                                <div>
+                                    <span class="text-gray-400 text-13 d-block">Location</span>
+                                    <span class="text-heading fw-medium text-15">@Model.Country</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="p-24 pt-0">
+                        <form asp-action="ToggleStatus" asp-controller="Admin_Instructor" method="post" asp-route-id="@Model.Id">
+                            @if (Model.IsActive)
+                            {
+                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill py-11 fw-semibold hover-scale-1" onclick="return confirm('Block this instructor?');">
+                                    <i class="ph ph-prohibit me-2"></i> Block Instructor
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-success w-100 rounded-pill py-11 fw-semibold hover-scale-1" onclick="return confirm('Activate this instructor?');">
+                                    <i class="ph ph-check-circle me-2"></i> Unblock Instructor
+                                </button>
+                            }
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-7">
+
+            <div class="row gy-4 mb-24">
+                <div class="col-sm-6">
+                    <div class="card p-20 rounded-12 border border-gray-100 hover-border-main-600 transition-2 h-100">
+                        <div class="flex-align gap-20">
+                            <span class="w-60 h-60 rounded-circle bg-main-50 text-main-600 flex-center text-3xl flex-shrink-0">
+                                <i class="ph-fill ph-video-camera"></i>
+                            </span>
+                            <div>
+                                <h3 class="mb-4">@Model.TotalCourses</h3>
+                                <span class="text-gray-500 text-15">Created Courses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card p-20 rounded-12 border border-gray-100 hover-border-warning-600 transition-2 h-100">
+                        <div class="flex-align gap-20">
+                            <span class="w-60 h-60 rounded-circle bg-warning-50 text-warning-600 flex-center text-3xl flex-shrink-0">
+                                <i class="ph-fill ph-users-three"></i>
+                            </span>
+                            <div>
+                                <h3 class="mb-4">@Model.TotalStudents</h3>
+                                <span class="text-gray-500 text-15">Total Students</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border border-gray-100 rounded-12 overflow-hidden">
+                <div class="card-header border-bottom border-gray-100 py-16 px-24">
+                    <h5 class="mb-0">Created Courses</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.CreatedCourses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium">Course Title</th>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium text-center">Students</th>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium text-center">Rating</th>
+                                        <th class="px-24 py-16 text-gray-500 text-14 fw-medium text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.CreatedCourses)
+                                    {
+                                        <tr>
+                                            <td class="px-24 py-16 align-middle">
+                                                <div class="flex-align gap-12">
+                                                    <span class="w-40 h-40 rounded-circle bg-main-50 text-main-600 flex-center text-xl flex-shrink-0">
+                                                        <i class="ph-fill ph-play-circle"></i>
+                                                    </span>
+                                                    <span class="h6 mb-0 text-heading text-15 fw-semibold">@course.Title</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-24 py-16 align-middle text-center">
+                                                <span class="text-14 fw-medium text-gray-600">@course.StudentsCount</span>
+                                            </td>
+                                            <td class="px-24 py-16 align-middle text-center">
+                                                <div class="d-flex align-items-center justify-content-center gap-1 text-warning-600">
+                                                    <i class="ph-fill ph-star"></i>
+                                                    <span class="text-heading fw-bold text-14">@course.Rating</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-40">
+                            <div class="w-80 h-80 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-4xl mb-16">
+                                <i class="ph ph-video-camera-slash"></i>
+                            </div>
+                            <h6 class="text-gray-400 fw-medium">No courses created by this instructor yet.</h6>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

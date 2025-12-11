@@ -1,0 +1,145 @@
+﻿@model Dashboard_vm
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="dashboard-body">
+
+    <div class="row mb-24">
+        <div class="col-12">
+            <div class="card bg-main-600 rounded-16 position-relative overflow-hidden border-0">
+                <div class="card-body p-32 z-1 position-relative">
+                    <h3 class="text-white mb-2">Welcome back, Admin! 👋</h3>
+                    <p class="text-white opacity-75">Here's what's happening with your learning platform today.</p>
+                </div>
+                <img src="/Admin/assets/images/shapes/wave-bg.png" alt="" class="position-absolute end-0 bottom-0 z-0 opacity-25">
+            </div>
+        </div>
+    </div>
+
+    <div class="row gy-4 mb-24">
+
+        <div class="col-xxl-3 col-sm-6">
+            <div class="card p-20 border border-gray-100 rounded-12 hover-border-main-600 transition-2 h-100">
+                <div class="flex-between mb-16">
+                    <div class="w-48 h-48 rounded-circle bg-main-50 text-main-600 flex-center text-2xl">
+                        <i class="ph-fill ph-student"></i>
+                    </div>
+                </div>
+                <h3 class="mb-4">@Model.TotalStudents</h3>
+                <span class="text-gray-500">Total Students</span>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6">
+            <div class="card p-20 border border-gray-100 rounded-12 hover-border-warning-600 transition-2 h-100">
+                <div class="flex-between mb-16">
+                    <div class="w-48 h-48 rounded-circle bg-warning-50 text-warning-600 flex-center text-2xl">
+                        <i class="ph-fill ph-chalkboard-teacher"></i>
+                    </div>
+                </div>
+                <h3 class="mb-4">@Model.TotalInstructors</h3>
+                <span class="text-gray-500">Expert Instructors</span>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6">
+            <div class="card p-20 border border-gray-100 rounded-12 hover-border-purple-600 transition-2 h-100">
+                <div class="flex-between mb-16">
+                    <div class="w-48 h-48 rounded-circle bg-purple-50 text-purple-600 flex-center text-2xl">
+                        <i class="ph-fill ph-video-camera"></i>
+                    </div>
+                </div>
+                <h3 class="mb-4">@Model.TotalCourses</h3>
+                <span class="text-gray-500">Total Courses</span>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6">
+            <div class="card p-20 border border-gray-100 rounded-12 hover-border-success-600 transition-2 h-100">
+                <div class="flex-between mb-16">
+                    <div class="w-48 h-48 rounded-circle bg-success-50 text-success-600 flex-center text-2xl">
+                        <i class="ph-fill ph-currency-dollar"></i>
+                    </div>
+                </div>
+                <h3 class="mb-4">$@Model.TotalRevenue.ToString("N0")</h3>
+                <span class="text-gray-500">Total Revenue</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row gy-4">
+
+        <div class="col-xl-8">
+            <div class="card border border-gray-100 rounded-12 h-100">
+                <div class="card-header border-bottom border-gray-100 py-16 px-24 flex-between">
+                    <h5 class="mb-0">Recently Added Courses</h5>
+                    <a asp-controller="Admin_Course" asp-action="Index" class="text-main-600 hover-text-decoration-underline fw-medium">View All</a>
+                </div>
+                <div class="card-body p-0 overflow-x-auto">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-24 py-12 text-gray-500 text-sm">Course</th>
+                                <th class="px-24 py-12 text-gray-500 text-sm">Price</th>
+                                <th class="px-24 py-12 text-gray-500 text-sm text-end">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var course in Model.LatestCourses)
+                            {
+                                <tr>
+                                    <td class="px-24 py-12">
+                                        <div class="flex-align gap-12">
+                                            <div class="w-40 h-40 rounded-8 overflow-hidden border border-gray-100 flex-shrink-0">
+                                                <img src="@(string.IsNullOrEmpty(course.ImgUrl) ? "/Admin/assets/images/thumbs/course-img1.png" : course.ImgUrl)" class="w-100 h-100 object-fit-cover">
+                                            </div>
+                                            <h6 class="text-14 mb-0 text-line-1">@course.Title</h6>
+                                        </div>
+                                    </td>
+                                    <td class="px-24 py-12 fw-bold text-heading">$@course.Price</td>
+                                    <td class="px-24 py-12 text-end">
+                                        <span class="badge bg-success-50 text-success-600 rounded-pill border border-success-100">Published</span>
+                                       
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card border border-gray-100 rounded-12 h-100">
+                <div class="card-header border-bottom border-gray-100 py-16 px-24 flex-between">
+                    <h5 class="mb-0">New Students</h5>
+                    <a asp-controller="Admin_Student" asp-action="Index" class="text-main-600 hover-text-decoration-underline fw-medium">View All</a>
+                </div>
+                <div class="card-body p-24">
+                    <div class="d-flex flex-column gap-24">
+                        @foreach (var student in Model.NewStudents)
+                        {
+                            <div class="flex-between gap-16">
+                                <div class="flex-align gap-12">
+                                    <div class="w-40 h-40 rounded-circle overflow-hidden border border-white shadow-sm">
+                                        <img src="@(string.IsNullOrEmpty(student.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : student.ImgUrl)" class="w-100 h-100 object-fit-cover">
+                                    </div>
+                                    <div>
+                                        <h6 class="text-14 mb-0">@student.Name</h6>
+                                        <span class="text-12 text-gray-400">Student</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="w-32 h-32 rounded-circle bg-gray-50 flex-center text-gray-500 hover-bg-main-50 hover-text-main-600 transition-1">
+                                    <i class="ph ph-envelope-simple"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

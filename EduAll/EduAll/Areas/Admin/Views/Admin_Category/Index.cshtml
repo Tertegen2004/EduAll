@@ -1,0 +1,351 @@
+﻿
+@model List<Category_vm>
+
+@{
+    ViewData["Title"] = "Categories List";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Categories</span></li>
+            </ul>
+        </div>
+
+        <div class="flex-align gap-16 flex-wrap">
+            <div class="position-relative flex-grow-1 max-w-300">
+                <input type="text" id="searchInput" class="form-control ps-48 py-12 rounded-pill border-gray-100 focus-border-main-600" placeholder="Search category...">
+                <span class="position-absolute top-50 start-0 translate-middle-y ms-20 text-gray-400 text-xl d-flex">
+                    <i class="ph ph-magnifying-glass"></i>
+                </span>
+            </div>
+
+            <button type="button" class="btn btn-main rounded-pill py-10 px-24 flex-align gap-8 fw-bold" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="ph ph-plus text-xl"></i> Add Category
+            </button>
+        </div>
+    </div>
+
+    <div class="card overflow-hidden border-0 shadow-sm rounded-16">
+        <div class="card-body p-0 overflow-x-auto">
+            <table id="categoryTable" class="table table-hover align-middle mb-0">
+                <thead class="bg-gray-50 text-center">
+                    <tr>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-start ps-24">Category Name</th>
+
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-center" style="max-width: 300px;">Description</th>
+
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Total Courses</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-end pe-24">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center" id="categoryTableBody">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var category in Model)
+                        {
+                            <tr class="transition-1">
+                                <td class="text-start ps-24">
+                                    <div class="flex-align gap-12">
+                                        <div class="w-40 h-40 rounded-circle bg-main-50 flex-center border border-main-100 flex-shrink-0">
+                                            @if (!string.IsNullOrEmpty(category.Img))
+                                            {
+                                                <img src="@category.Img" alt="Icon" class="w-24 h-24 object-fit-contain">
+                                            }
+                                            else
+                                            {
+                                                <i class="ph ph-squares-four text-main-600 text-xl"></i>
+                                            }
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <span class="h6 mb-0 fw-semibold text-heading text-15 search-name">@category.Name</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="text-gray-600 text-13 d-block text-truncate-2"
+                                          title="@category.Description"
+                                          data-bs-toggle="tooltip"
+                                          style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">
+                                        @(string.IsNullOrEmpty(category.Description) ? "No description available" : category.Description)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="py-4 px-16 rounded-pill bg-gray-100 text-gray-600 fw-bold text-13 border border-gray-200">
+                                        @category.CoursesCount Courses
+                                    </span>
+                                </td>
+
+                                <td class="text-end pe-24">
+                                    <div class="flex-align gap-8 justify-content-end">
+                                        <button type="button"
+                                                class="edit-category-btn w-32 h-32 bg-main-50 text-main-600 rounded-circle flex-center hover-bg-main-600 hover-text-white transition-2 border-0" data-bs-toggle="modal"
+                                                data-bs-target="#editCategoryModal"
+                                                data-id="@category.Id"
+                                                data-name="@category.Name"
+                                                data-description="@category.Description"
+                                                data-img="@category.Img">
+                                            <i class="ph ph-pencil-simple"></i>
+                                        </button>
+
+                                        <form asp-action="Delete" method="post" asp-route-id="@category.Id" class="d-inline">
+
+                                            <button type="submit"
+                                                    class="w-32 h-32 bg-danger-50 text-danger-600 rounded-circle flex-center hover-bg-danger-600 hover-text-white transition-2 border-0"
+                                                    title="Delete" data-bs-toggle="tooltip"
+                                                    onclick="return confirm('Are you sure? All courses in this category might be affected!');">
+                                                <i class="ph ph-trash text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-40">
+                                <div class="text-center">
+                                    <div class="w-60 h-60 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-3xl mb-16">
+                                        <i class="ph ph-squares-four"></i>
+                                    </div>
+                                    <h6 class="text-gray-500">No categories found.</h6>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="4" class="text-center py-40">
+                            <h6 class="text-gray-500">No matching categories found.</h6>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-16">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category Name</label>
+                        <input type="text" name="Name" class="form-control rounded-pill" required placeholder="e.g. Web Development">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="Description" class="form-control rounded-12" rows="4" placeholder="Write a short description about this category..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Icon / Image</label>
+
+                        <div class="upload-image-wrapper border border-dashed border-gray-200 rounded-12 p-3 text-center bg-gray-50 position-relative d-flex align-items-center justify-content-center overflow-hidden"
+                             style="height: 150px;">
+
+                            <img id="categoryIconPreview" src="#" alt="Preview"
+                                 class="position-absolute w-100 h-100 object-fit-cover"
+                                 style="top: 0; left: 0; display: none; z-index: 1;">
+
+                            <div id="categoryIconPlaceholder" class="z-0">
+                                <i class="ph ph-image text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-13 text-gray-500 mb-0">Click to upload icon</p>
+                            </div>
+
+                            <input type="file" name="Img" id="categoryIconInput"
+                                   class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer"
+                                   style="z-index: 2;"
+                                   accept="image/*">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-outline-gray rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-main rounded-pill px-24">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-16">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+
+                    <input type="hidden" name="Id" id="editCategoryId" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category Name</label>
+                        <input type="text" name="Name" id="editCategoryName" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="Description" id="editCategoryDescription" class="form-control rounded-12" rows="4"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Icon / Image <span class="text-muted fw-normal small">(Leave empty to keep current)</span></label>
+
+                        <div class="upload-image-wrapper border border-dashed border-gray-200 rounded-12 p-3 text-center bg-gray-50 position-relative d-flex align-items-center justify-content-center overflow-hidden"
+                             style="height: 150px;">
+
+                            <img id="editCategoryIconPreview" src="#" alt="Preview"
+                                 class="position-absolute w-100 h-100 object-fit-cover"
+                                 style="top: 0; left: 0; z-index: 1;">
+
+                            <div id="editCategoryIconPlaceholder" class="z-0" style="display:none;">
+                                <i class="ph ph-image text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-13 text-gray-500 mb-0">Click to change icon</p>
+                            </div>
+
+                            <input type="file" name="Img" id="editCategoryIconInput"
+                                   class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer"
+                                   style="z-index: 2;"
+                                   accept="image/*">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-outline-gray rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-main rounded-pill px-24">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Alert Animation
+            $(".alert").fadeIn(600);
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () { $(this).remove(); });
+            }, 2000);
+
+            // 2. Tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) })
+
+            // 3. Live Search
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                var hasVisibleRows = false;
+
+                $("#categoryTableBody tr:not(#noResultsRow)").filter(function () {
+                    var name = $(this).find(".search-name").text().toLowerCase();
+                    var isVisible = name.indexOf(value) > -1;
+                    $(this).toggle(isVisible);
+                    if (isVisible) hasVisibleRows = true;
+                });
+
+                if (!hasVisibleRows && value.length > 0) { $("#noResultsRow").show(); }
+                else { $("#noResultsRow").hide(); }
+            });
+        });
+
+        $(document).ready(function () {
+
+            // ============================================================
+            // 1. معاينة الصورة في مودال "الإضافة" (Add New Category)
+            // ============================================================
+            $("#categoryIconInput").change(function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#categoryIconPreview').attr('src', e.target.result).fadeIn();
+                        $('#categoryIconPlaceholder').hide();
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+            // ============================================================
+            // 2. معاينة الصورة في مودال "التعديل" (Edit Category) - ⚠️ ده كان ناقص
+            // ============================================================
+            $("#editCategoryIconInput").change(function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#editCategoryIconPreview').attr('src', e.target.result).fadeIn();
+                        $('#editCategoryIconPlaceholder').hide();
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+            // ============================================================
+            // 3. زرار التعديل (ملء البيانات + عرض الصورة القديمة)
+            // ============================================================
+            // ملاحظة: تأكد إن زرار التعديل في الجدول واخد كلاس "edit-category-btn"
+            $('.edit-category-btn').click(function () {
+                var btn = $(this);
+
+                // أخذ البيانات من الزرار
+                var id = btn.data('id');
+                var name = btn.data('name');
+                var description = btn.data('description');
+                var imgUrl = btn.data('img');
+
+                // وضع البيانات في حقول المودال
+                $('#editCategoryId').val(id);
+                $('#editCategoryName').val(name);
+                $('#editCategoryDescription').val(description);
+
+                // تفريغ حقل الملف الجديد (عشان لو مرفعش حاجة)
+                $('#editCategoryIconInput').val('');
+
+                // منطق عرض الصورة القديمة
+                if (imgUrl && imgUrl !== '') {
+                    $('#editCategoryIconPreview').attr('src', imgUrl).show();
+                    $('#editCategoryIconPlaceholder').hide();
+                } else {
+                    $('#editCategoryIconPreview').hide();
+                    $('#editCategoryIconPlaceholder').show();
+                }
+            });
+
+            // ============================================================
+            // 4. تنظيف مودال الإضافة عند الغلق (Reset)
+            // ============================================================
+            $('#addCategoryModal').on('hidden.bs.modal', function () {
+                $('#categoryIconPreview').hide().attr('src', '#');
+                $('#categoryIconPlaceholder').show();
+                $('#categoryIconInput').val('');
+                $('input[name="Name"]').val('');
+                $('textarea[name="Description"]').val('');
+            });
+
+        });
+        
+    </script>
+}

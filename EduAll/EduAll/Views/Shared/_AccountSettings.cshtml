@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - EduAll</title>
+    <link rel="shortcut icon" href="/Admin/assets/images/logo/favicon.png">
+    <link rel="stylesheet" href="/Admin/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Admin/assets/css/file-upload.css">
+    <link rel="stylesheet" href="/Admin/assets/css/plyr.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="/Admin/assets/css/full-calendar.css">
+    <link rel="stylesheet" href="/Admin/assets/css/jquery-ui.css">
+    <link rel="stylesheet" href="/Admin/assets/css/editor-quill.css">
+    <link rel="stylesheet" href="/Admin/assets/css/apexcharts.css">
+    <link rel="stylesheet" href="/Admin/assets/css/calendar.css">
+    <link rel="stylesheet" href="/Admin/assets/css/jquery-jvectormap-2.0.5.css">
+    <link rel="stylesheet" href="/Admin/assets/css/main.css">
+
+    <style>
+        /* اجعل المحتوى يأخذ الشاشة كاملة */
+        .dashboard-main-wrapper {
+            margin-inline-start: 0 !important; /* إلغاء الهامش الأيسر */
+            width: 100% !important;
+        }
+
+        /* اجعل الناف بار العلوي يأخذ الشاشة كاملة */
+        .top-navbar {
+            width: 100% !important;
+            margin-inline-start: 0 !important;
+            left: 0 !important;
+        }
+
+        /* إخفاء زر فتح السايدبار (لأنه غير موجود) */
+        .toggle-btn {
+            display: none !important;
+        }
+
+        /* تحسينات إضافية للموبايل */
+        @@media (max-width: 991px) {
+            .dashboard-body {
+                padding-inline: 16px !important;
+            }
+        }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+    <div class="side-overlay"></div>
+
+    <div class="dashboard-main-wrapper">
+
+        <div class="top-navbar flex-between gap-16">
+            <div class="flex-align gap-16">
+
+                <form action="#" class="w-350 d-sm-block d-none">
+                    <div class="position-relative">
+                        <button type="submit" class="input-icon text-xl d-flex text-gray-100 pointer-event-none">
+                            <i class="ph ph-magnifying-glass"></i>
+                        </button>
+                        <input type="text" class="form-control ps-40 h-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15" placeholder="Search..." />
+                    </div>
+                </form>
+            </div>
+
+             <div class="flex-align gap-16">
+                 <partial name="_Login_Register" />
+             </div>
+        </div>
+
+
+        <div class="container-fluid px-4">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+
+    </div>
+
+
+    <script src="/Admin/assets/js/jquery-3.7.1.min.js"></script>
+    <script src="/Admin/assets/js/boostrap.bundle.min.js"></script>
+    <script src="/Admin/assets/js/phosphor-icon.js"></script>
+    <script src="/Admin/assets/js/file-upload.js"></script>
+    <script src="/Admin/assets/js/plyr.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="/Admin/assets/js/full-calendar.js"></script>
+    <script src="/Admin/assets/js/jquery-ui.js"></script>
+    <script src="/Admin/assets/js/editor-quill.js"></script>
+    <script src="/Admin/assets/js/apexcharts.min.js"></script>
+    <script src="/Admin/assets/js/calendar.js"></script>
+    <script src="/Admin/assets/js/jquery-jvectormap-2.0.5.min.js"></script>
+    <script src="/Admin/assets/js/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="/Admin/assets/js/main.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

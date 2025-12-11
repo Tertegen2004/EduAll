@@ -1,0 +1,137 @@
+﻿@using EduAll.Domain
+@model Course
+
+@{
+    ViewData["Title"] = "Publish Course";
+    
+    // حساب الإحصائيات البسيطة للعرض
+    var totalLessons = Model.Sections.Sum(s => s.Lessons.Count);
+    var totalQuizzes = Model.Sections.Sum(s => s.Quizzes.Count);
+    // (اختياري) حساب المدة لو عندك خاصية Duration في الدروس، أو استخدم مدة الكورس الكلية
+    var totalDuration = Model.Duration; 
+}
+
+<div class="dashboard-body">
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Publish Course</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <ul class="step-list mb-24">
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex"><i class="ph-bold ph-check"></i></span> Course Details <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex"><i class="ph-bold ph-check"></i></span> Upload Videos <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 done">
+            <span class="icon text-xl d-flex"><i class="ph-bold ph-check"></i></span> Create Quiz <span class="line position-relative"></span>
+        </li>
+        <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6 active">
+            <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span> Publish Course <span class="line position-relative"></span>
+        </li>
+    </ul>
+
+    <div class="card">
+        <div class="card-header border-0 flex-align gap-8">
+            <h5 class="mb-0">Course Overview</h5>
+            <button type="button" class="text-main-600 text-md d-flex" data-bs-toggle="tooltip" data-bs-title="Review your course before publishing">
+                <i class="ph-fill ph-question"></i>
+            </button>
+        </div>
+        
+        <div class="card-body pt-0">
+            <div class="border border-gray-100 p-20 rounded-12">
+                
+                <div class="flex-between">
+                    <span class="py-6 px-16 bg-gray-50 text-gray-500 rounded-pill text-15">@Model.Category?.Name</span>
+                    
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="text-main-600 text-xl hover-text-main-700" title="Edit Details">
+                        <i class="ph-bold ph-pencil-simple"></i>
+                    </a>
+                </div>
+
+                <h3 class="my-8">@Model.Title</h3>
+
+                <div class="flex-align gap-24 flex-wrap mb-24">
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-video-camera"></i></span>
+                        <span class="text-gray-500 d-flex text-15">@totalLessons Lessons</span>
+                    </div>
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-clock"></i></span>
+                        <span class="text-gray-500 d-flex text-15">@totalDuration Hours</span>
+                    </div>
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-person"></i></span>
+                        <span class="text-gray-500 d-flex text-15">@Model.Instructor.FirstName @Model.Instructor.LastName</span>
+                    </div>
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-question"></i></span>
+                        <span class="text-gray-500 d-flex text-15">@totalQuizzes Quizzes</span>
+                    </div>
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-chart-bar"></i></span>
+                        <span class="text-gray-500 d-flex text-15">@Model.Level</span>
+                    </div>
+                    <div class="flex-align gap-8">
+                        <span class="text-gray-200 d-flex text-16"><i class="ph-fill ph-currency-dollar"></i></span>
+                        <span class="text-main-600 fw-bold d-flex text-15">$@Model.Price</span>
+                    </div>
+
+                </div>
+
+                <div class="my-24 position-relative rounded-16 overflow-hidden" style="max-height: 400px;">
+                    <img src="@(string.IsNullOrEmpty(Model.ImgUrl) ? "/Admin/assets/images/thumbs/course-img1.png" : Model.ImgUrl)" 
+                         alt="Course Image" 
+                         class="w-100 h-100 object-fit-cover">
+                </div>
+
+                <h5 class="mb-16 fw-bold">Course Description</h5>
+                <div class="text-gray-500 text-15 max-w-845 description-content">
+                    @Html.Raw(Model.Description)
+                </div>
+
+                <h5 class="mt-32 mb-16 fw-semibold">Content Summary</h5>
+                <div class="border border-gray-100 rounded-12 overflow-hidden">
+                    @foreach (var sec in Model.Sections.OrderBy(s => s.Order))
+                    {
+                        <div class="p-20 border-bottom d-flex justify-content-between bg-gray-50">
+                            <span class="fw-bold text-heading">@sec.Title</span>
+                            <span class="text-muted text-sm">@sec.Lessons.Count Lessons • @sec.Quizzes.Count Quizzes</span>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <div class="flex-align justify-content-end gap-8 mt-24">
+                <a asp-action="CreateQuiz" asp-route-courseId="@Model.Id" class="btn btn-outline-main rounded-pill py-9 px-20">Back</a>
+                
+                <form asp-action="PublishCourse" method="post" asp-route-courseId="@Model.Id">
+                     <button type="submit" class="btn btn-main rounded-pill py-9 px-32 fw-bold"
+                             onclick="return confirm('Are you sure you want to publish this course? It will be visible to students.');">
+                        <i class="ph-bold ph-rocket-launch me-2"></i> Publish Now
+                     </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // تفعيل الـ Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}

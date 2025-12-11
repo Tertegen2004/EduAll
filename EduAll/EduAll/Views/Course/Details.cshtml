@@ -1,0 +1,504 @@
+﻿@using EduAll.ViewModel
+
+@model CourseDetails_vm
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+}
+
+<style>
+    /* تنسيق نجوم التقييم في الفورم */
+    .rate {
+        float: left;
+        height: 46px;
+        padding: 0 10px;
+    }
+
+        .rate:not(:checked) > input {
+            position: absolute;
+            opacity: 0; /* مخفي */
+            pointer-events: none; /* لا يتفاعل مع الماوس */
+            width: 0;
+            height: 0;
+            margin: 0; /* عشان ما ياخدش مساحة */
+        }
+
+        .rate:not(:checked) > label {
+            float: right;
+            width: 1em;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 30px;
+            color: #ccc;
+        }
+
+            .rate:not(:checked) > label:before {
+                content: '★ ';
+            }
+
+        .rate > input:checked ~ label {
+            color: #ffc700;
+        }
+
+        .rate:not(:checked) > label:hover,
+        .rate:not(:checked) > label:hover ~ label {
+            color: #deb217;
+        }
+
+        .rate > input:checked + label:hover,
+        .rate > input:checked + label:hover ~ label,
+        .rate > input:checked ~ label:hover,
+        .rate > input:checked ~ label:hover ~ label,
+        .rate > label:hover ~ input:checked ~ label {
+            color: #c59b08;
+        }
+</style>
+<!-- ==================== Breadcrumb Start Here ==================== -->
+<section class="breadcrumb py-120 bg-main-25 position-relative z-1 overflow-hidden mb-0">
+    <img src="assets/images/shapes/shape1.png" alt="" class="shape one animation-rotation d-md-block d-none">
+    <img src="assets/images/shapes/shape2.png" alt="" class="shape two animation-scalation d-md-block d-none">
+    <img src="assets/images/shapes/shape3.png" alt="" class="shape eight animation-walking d-md-block d-none">
+    <img src="assets/images/shapes/shape5.png" alt="" class="shape six animation-walking d-md-block d-none">
+    <img src="assets/images/shapes/shape4.png" alt="" class="shape four animation-scalation">
+    <img src="assets/images/shapes/shape4.png" alt="" class="shape nine animation-scalation">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="breadcrumb__wrapper">
+                    <h1 class="breadcrumb__title display-4 fw-semibold text-center"> Courses Details</h1>
+                    <ul class="breadcrumb__list d-flex align-items-center justify-content-center gap-4">
+                        <li class="breadcrumb__item">
+                            <a asp-action="index" asp-controller="home" class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium">
+                                <i class="text-lg d-inline-flex ph-bold ph-house"></i> Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <a asp-action="index" asp-controller="course" class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium"> Courses</a>
+                        </li>
+                        <li class="breadcrumb__item ">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <span class="text-main-two-600"> Courses Details </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==================== Breadcrumb End Here ==================== -->
+
+<!-- ============================== Course Details Section Start ============================== -->
+
+
+
+<section class="course-details py-120">
+    <div class="container">
+        <div class="row gy-4">
+            
+            <div class="col-xl-8">
+                
+                <div class="course-details__content border border-neutral-30 rounded-12 bg-main-25 p-12">
+                    <img src="@Model.ImgUrl" alt="@Model.Title" class="rounded-8 cover-img w-100" style="max-height: 400px; object-fit: cover;">
+                    <div class="p-20">
+                        <h2 class="mt-24 mb-24">@Model.Title</h2>
+                        <p class="text-neutral-700">@Html.Raw(Model.Description)</p>
+                        
+                        <span class="d-block border-bottom border-main-100 my-32"></span>
+                        
+                        <h3 class="mb-16">What You Will Learn:</h3>
+                        <ul class="list-dotted d-flex flex-column gap-24">
+                            <li>Foundations of @Model.Title</li>
+                            <li>Mastering advanced concepts and techniques</li>
+                            <li>Practical projects and hands-on exercises</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="border border-neutral-30 rounded-12 bg-main-25 p-32 mt-24">
+                    <h5 class="mb-0">Curriculum</h5>
+                    <span class="d-block border border-neutral-30 my-24 border-dashed"></span>
+
+                    <div class="accordion common-accordion style-three" id="accordionCurriculum">
+                        @foreach (var sec in Model.Sections.Select((value, index) => new { value, index }))
+                        {
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button @(sec.index == 0 ? "" : "collapsed") text-neutral-700 fw-bold"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapseSection-@sec.index">
+                                        @sec.value.Title
+                                    </button>
+                                </h2>
+                                <div id="collapseSection-@sec.index" class="accordion-collapse collapse @(sec.index == 0 ? "show" : "")"
+                                     data-bs-parent="#accordionCurriculum">
+                                    <div class="accordion-body p-0">
+                                        @foreach (var lesson in sec.value.Lessons)
+                                        {
+                                            <a href="javascript:void(0)" class="curriculam-item flex-between gap-16 text-neutral-500 fw-medium hover-text-main-600">
+                                                <span class="flex-align gap-12">
+                                                    <i class="text-xl d-flex ph-bold ph-play-circle"></i>
+                                                    <span class="text-line-1">@lesson.Title</span>
+                                                </span>
+                                                <span class="flex-align gap-12 flex-shrink-0">
+                                                    @lesson.Duration
+                                                    <i class="text-xl d-flex ph-bold ph-lock-key"></i>
+                                                </span>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="border border-neutral-30 rounded-12 bg-main-25 p-32 mt-24">
+                    <div class="d-flex align-items-start flex-wrap flex-md-nowrap gap-32">
+                        <img src="@Model.InstructorImg" alt="@Model.InstructorName" class="w-120 h-120 rounded-circle object-fit-cover">
+                        <div class="flex-grow-1">
+                            <div class="flex-between gap-16 mb-12">
+                                <div>
+                                    <h4 class="mb-4">
+                                        <a asp-controller="Instructor" asp-action="Details" asp-route-id="@Model.InstructorId" class="text-neutral-900 hover-text-main-600">
+                                            @Model.InstructorName
+                                        </a>
+                                    </h4>
+                                    <span class="text-neutral-500">@Model.InstructorJob</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-neutral-500 mb-24">@Html.Raw(Model.InstructorBio)</p>
+
+                            <div class="d-flex gap-24 flex-wrap">
+                                <div class="flex-align gap-8">
+                                    <span class="text-main-600 text-xl"><i class="ph-bold ph-student"></i></span>
+                                    <span class="text-neutral-700 fw-medium">@Model.InstructorStudentsCount Students</span>
+                                </div>
+                                <div class="flex-align gap-8">
+                                    <span class="text-main-600 text-xl"><i class="ph-bold ph-video"></i></span>
+                                    <span class="text-neutral-700 fw-medium">@Model.InstructorCoursesCount Courses</span>
+                                </div>
+                                <div class="flex-align gap-8">
+                                    <span class="text-warning-600 text-xl"><i class="ph-fill ph-star"></i></span>
+                                    <span class="text-neutral-700 fw-medium">@Model.InstructorRating Rating</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border border-neutral-30 rounded-12 bg-white p-32 mt-24" id="reviews-section">
+
+                    <h5 class="mb-0">Student Reviews (@Model.ReviewsCount)</h5>
+                    <div class="flex-align gap-8 mt-8">
+                        <span class="text-warning-600 text-xl fw-bold">@Model.ReviewsCount.ToString("0.0")</span>
+                        <div class="flex-align gap-4">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= Math.Round(Model.Rating) ? "ph-fill text-warning-600" : "ph-bold text-neutral-300") ph-star"></i>
+                            }
+                        </div>
+                    </div>
+
+                    <span class="d-block border border-neutral-30 my-32 border-dashed"></span>
+
+                    <div class="reviews-list d-flex flex-column gap-32">
+                        @if (Model.Reviews.Any())
+                        {
+                            @foreach (var review in Model.Reviews)
+                            {
+                                <div class="review-item d-flex gap-24">
+                                    <img src="@review.ReviewerImg" alt="" class="w-60 h-60 rounded-circle cover-img object-fit-cover border">
+                                    <div class="flex-grow-1">
+                                        <div class="flex-between align-items-start mb-8">
+                                            <div>
+                                                <h6 class="text-lg mb-4 fw-medium">@review.ReviewerName</h6>
+                                                <span class="text-neutral-500 text-sm">@review.Date.ToString("dd MMM yyyy")</span>
+                                            </div>
+                                            <div class="flex-align gap-4">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="@(i <= review.Rating ? "ph-fill text-warning-600" : "ph-bold text-neutral-300") ph-star text-md"></i>
+                                                }
+                                            </div>
+                                        </div>
+                                        <p class="text-neutral-700">@review.Comment</p>
+                                    </div>
+                                </div>
+                                <hr class="border-neutral-30 my-0 border-dashed">
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-center text-neutral-500">No reviews yet. Be the first to review this course!</p>
+                        }
+                    </div>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mt-40 bg-main-25 p-24 rounded-12">
+                            <h5 class="mb-16">Write a Review</h5>
+                            <form asp-action="AddReview" asp-controller="Course" method="post">
+                                <input type="hidden" asp-for="NewReview.CourseId" value="@Model.Id" />
+
+                                <div class="mb-24">
+                                    <label class="text-neutral-700 text-lg fw-medium mb-8 d-block">Your Rating</label>
+                                    <div class="rate">
+                                        <input type="radio" id="star5" name="NewReview.Rating" value="5" />
+                                        <label for="star5" title="5 stars">5 stars</label>
+                                        <input type="radio" id="star4" name="NewReview.Rating" value="4" />
+                                        <label for="star4" title="4 stars">4 stars</label>
+                                        <input type="radio" id="star3" name="NewReview.Rating" value="3" />
+                                        <label for="star3" title="3 stars">3 stars</label>
+                                        <input type="radio" id="star2" name="NewReview.Rating" value="2" />
+                                        <label for="star2" title="2 stars">2 stars</label>
+                                        <input type="radio" id="star1" name="NewReview.Rating" value="1" />
+                                        <label for="star1" title="1 star">1 star</label>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <span asp-validation-for="NewReview.Rating" class="text-danger text-sm"></span>
+                                </div>
+
+                                <div class="mb-24">
+                                    <label class="text-neutral-700 text-lg fw-medium mb-12">Your Review</label>
+                                    <textarea asp-for="NewReview.Comment" class="common-input bg-white rounded-16 border-neutral-40" rows="4" placeholder="Share your experience..."></textarea>
+                                    <span asp-validation-for="NewReview.Comment" class="text-danger text-sm"></span>
+                                </div>
+
+                                <button type="submit" class="btn btn-main rounded-pill flex-center gap-8">
+                                    Submit Review <i class="ph-bold ph-paper-plane-right text-lg"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mt-40 text-center">
+                            <p class="text-neutral-700">Please <a asp-action="signin" asp-controller="account" asp-area="Admin" target="_blank" class="text-main-600 fw-bold hover-text-decoration-underline">Login</a> to write a review.</p>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="col-xl-4">
+                <div class="course-details__sidebar border border-neutral-30 rounded-12 bg-white p-8" style="top: 100px;">
+                    <div class="border border-neutral-30 rounded-12 bg-main-25 p-24 bg-main-25">
+                        
+                        <span class="text-neutral-700 text-lg mb-12">Price</span>
+                        <div class="flex-align align-items-start flex-wrap gap-8 border-bottom border-neutral-40 pb-24 mb-24">
+                            <div class="flex-align gap-12 text-neutral-700">
+                                <span class="text-2xl d-flex"><i class="ph-bold ph-tag"></i></span>
+                                <h2 class="mb-0 text-main-two-600">$@Model.Price</h2>
+                            </div>
+                        </div>
+
+                        <div class="border-bottom border-neutral-40 pb-24 mb-24 flex-between flex-wrap gap-16">
+                            <div class="flex-align gap-12">
+                                <span class="text-neutral-700 text-2xl d-flex"><i class="ph ph-video-camera"></i></span>
+                                <span class="text-neutral-700 text-lg fw-normal">Lessons</span>
+                            </div>
+                            <span class="text-lg fw-medium text-neutral-700">@Model.LessonsCount</span>
+                        </div>
+                         <div class="border-bottom border-neutral-40 pb-24 mb-24 flex-between flex-wrap gap-16">
+                            <div class="flex-align gap-12">
+                                <span class="text-neutral-700 text-2xl d-flex"><i class="ph ph-users"></i></span>
+                                <span class="text-neutral-700 text-lg fw-normal">Students</span>
+                            </div>
+                            <span class="text-lg fw-medium text-neutral-700">@Model.StudentsCount</span>
+                        </div>
+                        <div class="border-bottom border-neutral-40 pb-24 mb-24 flex-between flex-wrap gap-16">
+                            <div class="flex-align gap-12">
+                                <span class="text-neutral-700 text-2xl d-flex"><i class="ph ph-clock"></i></span>
+                                <span class="text-neutral-700 text-lg fw-normal">Duration</span>
+                            </div>
+                            <span class="text-lg fw-medium text-neutral-700">@Model.Duration</span>
+                        </div>
+                        <div class="border-bottom border-neutral-40 pb-24 mb-24 flex-between flex-wrap gap-16">
+                            <div class="flex-align gap-12">
+                                <span class="text-neutral-700 text-2xl d-flex"><i class="ph ph-chart-pie"></i></span>
+                                <span class="text-neutral-700 text-lg fw-normal">Level</span>
+                            </div>
+                            <span class="text-lg fw-medium text-neutral-700">@Model.Level</span>
+                        </div>
+                        <div class="border-bottom border-neutral-40 pb-24 mb-24 flex-between flex-wrap gap-16">
+                            <div class="flex-align gap-12">
+                                <span class="text-neutral-700 text-2xl d-flex"><i class="ph ph-globe"></i></span>
+                                <span class="text-neutral-700 text-lg fw-normal">Language</span>
+                            </div>
+                            <span class="text-lg fw-medium text-neutral-700">@Model.Language</span>
+                        </div>
+
+                        @if (Model.IsEnrolled)
+                        {
+                            <a asp-controller="course" asp-action="watch" asp-route-id="@Model.Id" class="btn btn-main rounded-pill w-100 mt-40">
+                                Go to Course <i class="ph-bold ph-play-circle text-lg"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <button type="button" onclick="addToCart(@Model.Id, this)" class="btn btn-main rounded-pill w-100 mt-40 flex-center gap-8">
+                                Add To Cart <i class="ph-bold ph-shopping-cart-simple text-lg"></i>
+                            </button>
+                        }
+
+                        <div class="mt-24 flex-center gap-24">
+                            <button type="button" onclick="toggleWishlist(@Model.Id, this)" 
+                                    class="w-44 h-44 flex-center rounded-circle text-lg transition-1 @(Model.IsWishlisted ? "bg-main-600 text-white" : "bg-white text-main-600 hover-bg-main-600 hover-text-white")">
+                                <i class="@(Model.IsWishlisted ? "ph-fill" : "ph-bold") ph-heart"></i>
+                            </button>
+                            
+                            <div class="dropdown flex-shrink-0">
+                                <button class="w-44 h-44 flex-center bg-white rounded-circle text-main-600 text-lg hover-text-white hover-bg-main-600 transition-1" type="button" data-bs-toggle="dropdown">
+                                    <i class="ph-bold ph-share-network"></i>
+                                </button>
+                                <div class="dropdown-menu border-0 bg-transparent p-0">
+                                    <div class="card border border-gray-100 rounded-12 box-shadow-custom p-16">
+                                        <ul class="social-list flex-align gap-8">
+                                            <li><a href="#" class="text-main-600 w-36 h-36 rounded-circle border border-main-200 flex-center"><i class="ph-bold ph-facebook-logo"></i></a></li>
+                                            <li><a href="#" class="text-main-600 w-36 h-36 rounded-circle border border-main-200 flex-center"><i class="ph-bold ph-twitter-logo"></i></a></li>
+                                            <li><a href="#" class="text-main-600 w-36 h-36 rounded-circle border border-main-200 flex-center"><i class="ph-bold ph-whatsapp-logo"></i></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ============================== Course Details Section End ============================== -->
+<!-- ================================= Certificate Section Start ================================= -->
+<div class="certificate">
+    <div class="container container--lg">
+        <div class="certificate-box px-16 bg-main-600 rounded-16">
+            <div class="container">
+                <div class="position-relative py-80">
+                    <div class="row align-items-center">
+                        <div class="col-xl-6">
+                            <div class="certificate__content">
+                                <div class="flex-align gap-8 mb-16 wow bounceInDown">
+                                    <span class="w-8 h-8 bg-white rounded-circle"></span>
+                                    <h5 class="text-white mb-0">Get Certificate</h5>
+                                </div>
+                                <h2 class="text-white mb-40 fw-medium wow bounceIn">Get Quality Skills Certificate From the EduAll</h2>
+                                <a href="" class="btn btn-white rounded-pill flex-align d-inline-flex gap-8 hover-bg-main-800 wow bounceInUp">
+                                    Get Started Now
+                                    <i class="ph-bold ph-arrow-up-right d-flex text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 d-xl-block d-none">
+                            <div class="certificate__thumb" data-aos="fade-up-left">
+                                <img src="/assets/images/thumbs/certificate-img.png" alt="" data-tilt data-tilt-max="8" data-tilt-speed="500" data-tilt-perspective="5000" data-tilt-full-page-listening>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ================================= Certificate Section End ================================= -->
+@section Scripts {
+    <script>
+
+        function toggleWishlist(courseId, btnElement) {
+            $.ajax({
+                url: '/Wishlist/Toggle',
+                type: 'POST',
+                data: { courseId: courseId },
+                success: function (response) {
+                    if (response.success) {
+                        var icon = $(btnElement).find('i');
+
+                        // 1. الإمساك بعنصر العداد (اللي في الهيدر)
+                        var countBadge = $("#wishlist-count");
+                        var currentCount = parseInt(countBadge.text()); // قراءة الرقم الحالي
+
+                        if (response.isAdded) {
+                            // === حالة الإضافة ===
+                            $(btnElement).addClass('bg-main-50 text-main-two-600').removeClass('bg-white text-neutral-500');
+                            icon.removeClass('ph ph-bold').addClass('ph-fill');
+
+                            // زيادة العداد
+                            countBadge.text(currentCount + 1);
+
+                            // (اختياري) تأثير انيميشن بسيط للعداد
+                            countBadge.addClass("animate__bounceIn").one("animationend", function () {
+                                $(this).removeClass("animate__bounceIn");
+                            });
+
+                        } else {
+                            // === حالة الحذف ===
+                            $(btnElement).removeClass('bg-main-50 text-main-two-600').addClass('bg-white text-neutral-500');
+                            icon.removeClass('ph-fill').addClass('ph-bold');
+
+                            // تنقيص العداد
+                            if (currentCount > 0) countBadge.text(currentCount - 1);
+                        }
+                    } else {
+                        window.location.href = '/Admin/Account/SignIn';
+                    }
+                },
+                error: function () {
+                    // handle error
+                }
+            });
+        }
+        function addToCart(courseId, btnElement) {
+            // نغير النص لـ "Adding..." عشان اليوزر يعرف إن فيه حاجة بتحصل
+            var originalText = $(btnElement).html();
+            $(btnElement).html('<i class="ph ph-spinner ph-spin"></i> Adding...');
+
+            $.ajax({
+                url: '/Cart/Add',
+                type: 'POST',
+                data: { courseId: courseId },
+                success: function (response) {
+                    if (response.success) {
+                        // 1. تحديث العداد في الهيدر
+                        $('#cart-count-badge').text(response.cartCount);
+
+                        // 2. تغيير شكل الزرار ليدل على النجاح
+                        $(btnElement).html('Added <i class="ph-bold ph-check"></i>');
+                        $(btnElement).addClass('text-success-600 cursor-default').attr('onclick', ''); // نلغي الضغط تاني
+
+                        // (اختياري) رسالة توستر
+                        // toastr.success(response.message);
+                    } else {
+                        // لو فشل (مثلاً موجود قبل كدا)
+                        if (response.message === "Login required") {
+                            window.location.href = '/Admin/Account/SignIn';
+                        } else {
+                            // نرجع الزرار زي ما كان ونطلع رسالة
+                            $(btnElement).html(originalText);
+                            alert(response.message); // أو toastr.warning
+                        }
+                    }
+                },
+                error: function () {
+                    $(btnElement).html(originalText);
+                    alert("Something went wrong");
+                }
+            });
+        }
+
+
+    </script>
+}

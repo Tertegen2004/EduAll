@@ -1,0 +1,7 @@
+﻿@model int
+<a asp-action="index" asp-controller="cart" class="info-action w-44 h-44 bg-main-25 hover-bg-main-600 rounded-circle flex-center text-xl text-neutral-500 hover-text-white position-relative me-6">
+    <i class="ph-bold ph-shopping-cart"></i>
+    <span id="cart-count-badge" class="w-22 h-22 flex-center rounded-circle bg-main-two-600 text-white text-xs position-absolute top-n6 end-n4">
+        @Model
+    </span>
+</a>

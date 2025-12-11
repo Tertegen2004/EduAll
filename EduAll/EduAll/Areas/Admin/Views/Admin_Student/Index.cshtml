@@ -1,0 +1,189 @@
+﻿@model List<Students_vm>
+
+@{
+    ViewData["Title"] = "Students List";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Students</span></li>
+            </ul>
+        </div>
+
+        <div class="flex-align gap-16 flex-wrap">
+            <div class="position-relative flex-grow-1 max-w-300">
+                <input type="text" id="searchInput" class="form-control ps-48 py-12 rounded-pill border-gray-100 focus-border-main-600" placeholder="Search student...">
+                <span class="position-absolute top-50 start-0 translate-middle-y ms-20 text-gray-400 text-xl d-flex">
+                    <i class="ph ph-magnifying-glass"></i>
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card overflow-hidden border-0 shadow-sm rounded-16">
+        <div class="card-body p-0 overflow-x-auto">
+            <table id="studentTable" class="table table-hover align-middle mb-0">
+                <thead class="bg-gray-50 text-center">
+                    <tr>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-start ps-24">Student Info</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Email Address</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Enrolled Courses</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Status</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-end pe-24">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center" id="studentTableBody">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var student in Model)
+                        {
+                            <tr class="transition-1">
+                                <td class="text-start ps-24">
+                                    <div class="flex-align gap-12">
+                                        <div class="w-40 h-40 rounded-circle overflow-hidden border border-white shadow-sm flex-shrink-0">
+                                            <img src="@(string.IsNullOrEmpty(student.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : student.ImgUrl)"
+                                                 alt="Student" class="w-100 h-100 object-fit-cover">
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <span class="h6 mb-0 fw-semibold text-heading text-15 search-name">@student.FullName</span>
+                                            <span class="text-13 text-gray-400">ID: @student.Id.Substring(0, 6)..</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-14 fw-medium text-gray-600 search-email">@student.Email</span>
+                                </td>
+                                <td>
+                                    <span class="py-4 px-12 rounded-pill bg-main-50 text-main-600 fw-bold text-13 border border-main-100">
+                                        @student.EnrolledCoursesCount Courses
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (student.IsActive)
+                                    {
+                                        <span class="text-13 py-4 px-12 bg-success-50 text-success-600 d-inline-flex align-items-center gap-6 rounded-pill border border-success-100">
+                                            <span class="w-6 h-6 bg-success-600 rounded-circle flex-shrink-0"></span> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-13 py-4 px-12 bg-danger-50 text-danger-600 d-inline-flex align-items-center gap-6 rounded-pill border border-danger-100">
+                                            <span class="w-6 h-6 bg-danger-600 rounded-circle flex-shrink-0"></span> Blocked
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end pe-24">
+                                    <div class="d-flex align-items-center justify-content-end gap-5">
+                                        <a asp-action="Details" asp-route-id="@student.Id"
+                                           class="w-32 h-32 bg-main-50 text-main-600 rounded-circle flex-center hover-bg-main-600 hover-text-white transition-2 border-0"
+                                           title="View Details" data-bs-toggle="tooltip">
+                                            <i class="ph ph-eye text-xl"></i>
+                                        </a>
+
+                                        <form asp-action="ToggleStatus" asp-controller="Admin_Student" method="post" asp-route-id="@student.Id" class="d-inline">
+                                            @if (student.IsActive)
+                                            {
+                                                <button type="submit"
+                                                        class="w-32 h-32 bg-danger-50 text-danger-600 rounded-circle flex-center hover-bg-danger-600 hover-text-white transition-2 border-0"
+                                                        title="Block Student" data-bs-toggle="tooltip"
+                                                        onclick="return confirm('Block this student?');">
+                                                    <i class="ph ph-prohibit text-lg"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit"
+                                                        class="w-32 h-32 bg-success-50 text-success-600 rounded-circle flex-center hover-bg-success-600 hover-text-white transition-2 border-0"
+                                                        title="Unblock Student" data-bs-toggle="tooltip"
+                                                        onclick="return confirm('Activate this student?');">
+                                                    <i class="ph ph-check-circle text-lg"></i>
+                                                </button>
+                                            }
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-40">
+                                <div class="text-center">
+                                    <div class="w-60 h-60 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-3xl mb-16">
+                                        <i class="ph ph-users-three"></i>
+                                    </div>
+                                    <h6 class="text-gray-500">No students found.</h6>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" class="text-center py-40">
+                            <h6 class="text-gray-500">No matching students found.</h6>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer border-top border-gray-100 py-16 px-24 flex-between flex-wrap gap-16">
+            <span class="text-gray-500 text-15">Showing @Model.Count entries</span>
+            <ul class="pagination flex-align flex-wrap gap-8">
+                <li class="page-item active">
+                    <a class="page-link h-36 w-36 flex-center text-14 rounded-8 fw-semibold bg-main-600 border-main-600 text-white" href="#">1</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Alert Animation
+            $(".alert").fadeIn(600);
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                    $(this).remove();
+                });
+            }, 2000);
+
+            // 2. Tooltips Initialization
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
+            // 3. Live Search
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                var hasVisibleRows = false;
+
+                $("#studentTableBody tr:not(#noResultsRow)").filter(function () {
+                    var name = $(this).find(".search-name").text().toLowerCase();
+                    var email = $(this).find(".search-email").text().toLowerCase();
+
+                    var isVisible = name.indexOf(value) > -1 || email.indexOf(value) > -1;
+                    $(this).toggle(isVisible);
+
+                    if (isVisible) hasVisibleRows = true;
+                });
+
+                if (!hasVisibleRows && value.length > 0) {
+                    $("#noResultsRow").show();
+                } else {
+                    $("#noResultsRow").hide();
+                }
+            });
+        });
+    </script>
+}

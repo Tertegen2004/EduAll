@@ -1,0 +1,256 @@
+﻿@model List<Instructor_vm>
+
+@{
+    ViewData["Title"] = "Instructors List";
+}
+
+<div class="dashboard-body">
+    <partial name="_Notification" />
+
+    <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+        <div class="breadcrumb mb-24">
+            <ul class="flex-align gap-4">
+                <li><a asp-controller="Home" asp-action="Index" class="text-gray-200 fw-normal text-15 hover-text-main-600">Home</a></li>
+                <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+                <li><span class="text-main-600 fw-normal text-15">Instructors</span></li>
+            </ul>
+        </div>
+
+        <div class="flex-align gap-16 flex-wrap">
+            <button type="button" class="btn btn-main rounded-pill py-10 px-24 flex-align gap-8 fw-bold" data-bs-toggle="modal" data-bs-target="#addInstructorModal">
+                <i class="ph ph-plus text-xl"></i> Add Instructor
+            </button>
+            <div class="position-relative flex-grow-1 max-w-300">
+            </div>
+
+
+            <div class="position-relative flex-grow-1 max-w-300">
+                <input type="text" id="searchInput" class="form-control ps-48 py-12 rounded-pill border-gray-100 focus-border-main-600" placeholder="Search instructor...">
+                <span class="position-absolute top-50 start-0 translate-middle-y ms-20 text-gray-400 text-xl d-flex">
+                    <i class="ph ph-magnifying-glass"></i>
+                </span>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="card overflow-hidden border-0 shadow-sm rounded-16">
+        <div class="card-body p-0 overflow-x-auto">
+            <table id="instructorTable" class="table table-hover align-middle mb-0">
+                <thead class="bg-gray-50 text-center">
+                    <tr>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16 text-start ps-24">Instructor Info</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Job Title</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Email</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Courses Created</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Status</th>
+                        <th class="h6 text-gray-500 text-14 fw-semibold py-16">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center" id="instructorTableBody">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var instructor in Model)
+                        {
+                            <tr class="transition-1">
+                                <td class="text-start ps-24">
+                                    <div class="flex-align gap-12">
+                                        <div class="w-40 h-40 rounded-circle overflow-hidden border border-white shadow-sm flex-shrink-0">
+                                            <img src="@(string.IsNullOrEmpty(instructor.ImgUrl) ? "/Admin/assets/images/thumbs/user-img.png" : instructor.ImgUrl)" 
+                                                 alt="Instructor" class="w-100 h-100 object-fit-cover">
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <span class="h6 mb-0 fw-semibold text-heading text-15 search-name">@instructor.FullName</span>
+                                            <span class="text-13 text-gray-400">ID: @instructor.Id.Substring(0, 6)..</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-14 fw-medium text-main-600 bg-main-50 px-2 py-1 rounded-4">@instructor.JobTitle</span>
+                                </td>
+                                <td>
+                                    <span class="text-14 fw-medium text-gray-600 search-email">@instructor.Email</span>
+                                </td>
+                                <td>
+                                    <span class="py-4 px-12 rounded-pill bg-gray-100 text-gray-600 fw-bold text-13 border border-gray-200">
+                                        @instructor.CreatedCoursesCount Courses
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (instructor.IsActive)
+                                    {
+                                        <span class="text-13 py-4 px-12 bg-success-50 text-success-600 d-inline-flex align-items-center gap-6 rounded-pill border border-success-100">
+                                            <span class="w-6 h-6 bg-success-600 rounded-circle flex-shrink-0"></span> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-13 py-4 px-12 bg-danger-50 text-danger-600 d-inline-flex align-items-center gap-6 rounded-pill border border-danger-100">
+                                            <span class="w-6 h-6 bg-danger-600 rounded-circle flex-shrink-0"></span> Blocked
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="flex-align gap-8 justify-content-center">
+                                        <a asp-action="Details" asp-route-id="@instructor.Id" class="w-32 h-32 bg-main-50 text-main-600 rounded-circle flex-center hover-bg-main-600 hover-text-white transition-2 border-0"
+                                           title="View Profile" data-bs-toggle="tooltip">
+                                            <i class="ph ph-eye text-xl"></i>
+                                        </a>
+
+                                        <form asp-action="ToggleStatus" asp-controller="Admin_Instructor" method="post" asp-route-id="@instructor.Id" class="d-inline">
+                                            @if (instructor.IsActive)
+                                            {
+                                                <button type="submit" 
+                                                        class="w-32 h-32 bg-danger-50 text-danger-600 rounded-circle flex-center hover-bg-danger-600 hover-text-white transition-2 border-0" 
+                                                        title="Block Instructor" data-bs-toggle="tooltip"
+                                                        onclick="return confirm('Are you sure you want to BLOCK this instructor?');">
+                                                    <i class="ph ph-prohibit text-lg"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" 
+                                                        class="w-32 h-32 bg-success-50 text-success-600 rounded-circle flex-center hover-bg-success-600 hover-text-white transition-2 border-0" 
+                                                        title="Activate Instructor" data-bs-toggle="tooltip"
+                                                        onclick="return confirm('Activate this instructor?');">
+                                                    <i class="ph ph-check-circle text-lg"></i>
+                                                </button>
+                                            }
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-40">
+                                <div class="text-center">
+                                    <div class=" bg-gray-50 flex-center mx-auto text-gray-400 text-3xl mb-16">
+                                        <i class="ph ph-chalkboard-teacher"></i>
+                                    </div>
+                                    <h6 class="text-gray-500">No instructors found.</h6>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" class="text-center py-40">
+                            <h6 class="text-gray-500">No matching instructors found.</h6>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer border-top border-gray-100 py-16 px-24 flex-between flex-wrap gap-16">
+            <span class="text-gray-500 text-15">Showing @Model.Count entries</span>
+            <ul class="pagination flex-align flex-wrap gap-8">
+                <li class="page-item active">
+                    <a class="page-link h-36 w-36 flex-center text-14 rounded-8 fw-semibold bg-main-600 border-main-600 text-white" href="#">1</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addInstructorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-16">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Add New Instructor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" asp-controller="Admin_Instructor" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12 text-center mb-3">
+                            <div class="d-inline-block position-relative">
+                                <img id="newInstructorPreview" src="/Admin/assets/images/thumbs/user-img.png" class="w-80 h-80 rounded-circle object-fit-cover border shadow-sm">
+                                <label for="instructorImageInput" class="position-absolute bottom-0 end-0 bg-main-600 text-white rounded-circle p-1 cursor-pointer">
+                                    <i class="ph ph-camera"></i>
+                                </label>
+                                <input type="file" name="ImageFile" id="instructorImageInput" hidden accept="image/*" onchange="document.getElementById('newInstructorPreview').src = window.URL.createObjectURL(this.files[0])">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="FirstName" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="LastName" class="form-control rounded-pill" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" name="JobTitle" class="form-control rounded-pill" placeholder="e.g. Senior Developer">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Country</label>
+                            <input type="text" name="Country" class="form-control rounded-pill" placeholder="e.g. Egypt">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="Email" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="Password" class="form-control rounded-pill" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-outline-gray rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-main rounded-pill px-4">Create Instructor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. أنيميشن التنبيهات
+            $(".alert").fadeIn(600);
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                    $(this).remove();
+                });
+            }, 2000);
+            
+            // تفعيل التولتيب
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
+            // 2. كود البحث الفوري
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                var hasVisibleRows = false;
+
+                $("#instructorTableBody tr:not(#noResultsRow)").filter(function () {
+                    var name = $(this).find(".search-name").text().toLowerCase();
+                    var email = $(this).find(".search-email").text().toLowerCase();
+                    
+                    var isVisible = name.indexOf(value) > -1 || email.indexOf(value) > -1;
+                    $(this).toggle(isVisible);
+                    
+                    if (isVisible) hasVisibleRows = true;
+                });
+
+                if (!hasVisibleRows && value.length > 0) {
+                    $("#noResultsRow").show();
+                } else {
+                    $("#noResultsRow").hide();
+                }
+            });
+        });
+    </script>
+}

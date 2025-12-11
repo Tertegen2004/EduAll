@@ -1,0 +1,265 @@
+﻿@using EduAll.ViewModel
+@model Wishlist_vm
+
+@{
+    ViewData["Title"] = "My Wishlist";
+    Layout = "_Layout";
+}
+
+<section class="breadcrumb py-120 bg-main-25 position-relative z-1 overflow-hidden mb-0">
+    <img src="assets/images/shapes/shape1.png" alt="" class="shape one animation-rotation d-md-block d-none">
+    <img src="assets/images/shapes/shape2.png" alt="" class="shape two animation-scalation d-md-block d-none">
+    <img src="assets/images/shapes/shape3.png" alt="" class="shape eight animation-walking d-md-block d-none">
+    <img src="assets/images/shapes/shape5.png" alt="" class="shape six animation-walking d-md-block d-none">
+    <img src="assets/images/shapes/shape4.png" alt="" class="shape four animation-scalation">
+    <img src="assets/images/shapes/shape4.png" alt="" class="shape nine animation-scalation">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="breadcrumb__wrapper">
+                    <h1 class="breadcrumb__title display-4 fw-semibold text-center"> Favourite Courses</h1>
+                    <ul class="breadcrumb__list d-flex align-items-center justify-content-center gap-4">
+                        <li class="breadcrumb__item">
+                            <a asp-action="Index" asp-controller="Home" class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium">
+                                <i class="text-lg d-inline-flex ph-bold ph-house"></i> Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <a asp-action="Index" asp-controller="Course" class="breadcrumb__link text-neutral-500 hover-text-main-600 fw-medium"> </a>
+                        </li>
+                        <li class="breadcrumb__item d-none">
+                            <i class="text-neutral-500 d-flex ph-bold ph-caret-right"></i>
+                        </li>
+                        <li class="breadcrumb__item">
+                            <span class="text-main-two-600"> Favourite Courses </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==================== Breadcrumb End Here ==================== -->
+<!-- =============================== Favorite Course Section Start ================================== -->
+
+
+<section class="favorite-course py-120">
+    <div class="container">
+
+        <div class="d-flex flex-wrap align-items-center justify-content-end mb-24">
+
+            @if (Model.Courses.Any())
+            {
+                <form asp-action="RemoveAll" method="post" onsubmit="return confirm('Are you sure you want to remove all items?');">
+                    <button type="submit" class="btn btn-outline-main py-12 px-24 rounded-pill flex-align gap-8 aos-init aos-animate fw-semibold" data-aos="fade-left">
+                        <i class="ph-bold ph-trash d-flex text-lg"></i>
+                        Remove All
+                    </button>
+                </form>
+            }
+        </div>
+
+        <div class="row gy-4">
+
+            @if (Model.Courses.Any())
+            {
+                @foreach (var course in Model.Courses)
+                {
+                    <div class="col-lg-4 col-sm-6 wow fadeInUp" data-aos="fade-up" data-aos-duration="200">
+                        <div class="course-item bg-white rounded-16 p-12 h-100 box-shadow-md">
+
+                            <div class="course-item__thumb rounded-12 overflow-hidden position-relative course-image-fixed-height">
+                                <a asp-controller="Course" asp-action="Details" asp-route-id="@course.Id" class="w-100 h-100 d-block">
+                                    <img src="@(string.IsNullOrEmpty(course.ImgUrl) ? "/assets/images/thumbs/course-img1.png" : course.ImgUrl)"
+                                         alt="@course.Title" class="course-item__img rounded-12 cover-img transition-2 w-100 h-100">
+                                </a>
+
+                                <div class="flex-align gap-8 bg-main-600 rounded-pill px-24 py-12 text-white position-absolute inset-block-start-0 inset-inline-start-0 mt-20 ms-20 z-1">
+                                    <span class="text-2xl d-flex"><i class="ph ph-clock"></i></span>
+                                    <span class="text-lg fw-medium">@course.DurationHours H</span>
+                                </div>
+
+                                <button type="button" onclick="toggleWishlist(@course.Id, this)"
+                                        class="wishlist-btn w-48 h-48 flex-center position-absolute inset-block-start-0 inset-inline-end-0 mt-20 me-20 z-1 text-2xl rounded-circle transition-2 text-white bg-main-two-600 hover-bg-white hover-text-main-two-600">
+                                    <i class="ph-fill ph-heart"></i>
+                                </button>
+                            </div>
+
+                            <div class="course-item__content pt-24">
+                                <h4 class="mb-28">
+                                    <a asp-controller="Course" asp-action="Details" asp-route-id="@course.Id" class="link text-line-2">@course.Title</a>
+                                </h4>
+
+                                <div class="flex-between gap-8 flex-wrap mb-16">
+                                    <div class="flex-align gap-8">
+                                        <span class="text-neutral-700 text-2xl d-flex"><i class="ph-bold ph-video-camera"></i></span>
+                                        <span class="text-neutral-700 text-lg fw-medium">@course.LessonsCount Lessons</span>
+                                    </div>
+                                    <div class="flex-align gap-8">
+                                        <span class="text-neutral-700 text-2xl d-flex"><i class="ph-bold ph-chart-bar"></i></span>
+                                        <span class="text-neutral-700 text-lg fw-medium">@course.Level</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex-between gap-8 flex-wrap">
+                                    <div class="flex-align gap-4">
+                                        <span class="text-2xl fw-medium text-warning-600 d-flex"><i class="ph-fill ph-star"></i></span>
+                                        <span class="text-lg text-neutral-700">4.8 <span class="text-neutral-100">(@course.StudentsCount)</span></span>
+                                    </div>
+                                    <div class="flex-align gap-8">
+                                        <span class="text-neutral-700 text-2xl d-flex">
+                                            <img src="@(string.IsNullOrEmpty(course.InstructorImg) ? "/assets/images/thumbs/user-img1.png" : course.InstructorImg)"
+                                                 alt="" class="w-32 h-32 object-fit-cover rounded-circle">
+                                        </span>
+                                        <span class="text-neutral-700 text-lg fw-medium">@course.InstructorName</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex-between gap-8 pt-24 border-top border-neutral-50 mt-28 border-dashed border-0">
+                                    <h4 class="mb-0 text-main-two-600">$@course.Price</h4>
+
+                                    @if (course.IsEnrolled)
+                                    {
+                                        <a asp-controller="MyCourses" asp-action="Index"
+                                           class="flex-align gap-8 text-success-600 transition-1 fw-semibold">
+                                            Owned <i class="ph-bold ph-check-circle"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                onclick="addToCart(@course.Id, this)"
+                                                class="flex-align gap-8 text-main-600 transition-1 fw-semibold bg-transparent border-0 p-0">
+                                            Add To Cart
+                                            <i class="ph ph-arrow-right"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="w-80 h-80 bg-gray-50 rounded-circle flex-center mx-auto text-gray-400 text-4xl mb-16">
+                        <i class="ph-fill ph-heart-break"></i>
+                    </div>
+                    <h5 class="text-neutral-500">Your wishlist is empty.</h5>
+                    <a asp-controller="Course" asp-action="Index" class="btn btn-main rounded-pill mt-3">Browse Courses</a>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<!-- =============================== Favorite Course Section End ================================== -->
+<!-- ================================= Certificate Section Start ================================= -->
+<div class="certificate">
+    <div class="container container--lg">
+        <div class="certificate-box px-16 bg-main-600 rounded-16">
+            <div class="container">
+                <div class="position-relative py-80">
+                    <div class="row align-items-center">
+                        <div class="col-xl-6">
+                            <div class="certificate__content">
+                                <div class="flex-align gap-8 mb-16 wow bounceInDown">
+                                    <span class="w-8 h-8 bg-white rounded-circle"></span>
+                                    <h5 class="text-white mb-0">Get Certificate</h5>
+                                </div>
+                                <h2 class="text-white mb-40 fw-medium wow bounceIn">Get Quality Skills Certificate From the EduAll</h2>
+                                <a href="" class="btn btn-white rounded-pill flex-align d-inline-flex gap-8 hover-bg-main-800 wow bounceInUp">
+                                    Get Started Now
+                                    <i class="ph-bold ph-arrow-up-right d-flex text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 d-xl-block d-none">
+                            <div class="certificate__thumb" data-aos="fade-up-left">
+                                <img src="assets/images/thumbs/certificate-img.png" alt="" data-tilt data-tilt-max="8" data-tilt-speed="500" data-tilt-perspective="5000" data-tilt-full-page-listening>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ================================= Certificate Section End ================================= -->
+@section Scripts {
+    <script>
+        // نفس كود الـ Toggle اللي كتبناه قبل كدا
+        // بس هنا ممكن نضيف سطر زيادة: لو شال القلب، الكارد يختفي من الصفحة فوراً
+        function toggleWishlist(courseId, btnElement) {
+            $.ajax({
+                url: '/Wishlist/Toggle',
+                type: 'POST',
+                data: { courseId: courseId },
+                success: function (response) {
+                    if (response.success && !response.isAdded) {
+                        // إخفاء الكارد بـ Animation جميل
+                        $(btnElement).closest('.col-lg-4').fadeOut(500, function () { $(this).remove(); });
+
+                        // لو الصفحة فضيت، ممكن تعمل ريلود عشان تظهر رسالة "Empty"
+                        if ($('.col-lg-4').length <= 1) {
+                            setTimeout(() => location.reload(), 600);
+                        }
+                    }
+                }
+            });
+        }
+
+        function addToCart(courseId, btnElement) {
+            // 1. تغيير شكل الزرار (Feedback)
+            var originalText = $(btnElement).html();
+            $(btnElement).html('<i class="ph ph-spinner ph-spin"></i> Adding...');
+            $(btnElement).prop('disabled', true); // نمنع الضغط مرتين
+
+            $.ajax({
+                url: '/Cart/Add', // تأكد من مسار الكنترولر
+                type: 'POST',
+                data: { courseId: courseId },
+                success: function (response) {
+                    if (response.success) {
+                        // === حالة النجاح ===
+                        // 1. تحديث العداد
+                        $('#cart-count-badge').text(response.cartCount);
+
+                        // 2. تغيير الزرار لعلامة صح
+                        $(btnElement).html('Added <i class="ph-bold ph-check"></i>');
+                        $(btnElement).addClass('text-success-600 cursor-default').attr('onclick', '');
+
+                    } else {
+                        // === حالة الفشل (موجود بالفعل أو غير مسجل) ===
+
+                        // نرجع الزرار لأصله فوراً
+                        $(btnElement).html(originalText);
+                        $(btnElement).prop('disabled', false);
+
+                        if (response.message === "Login required") {
+                            window.location.href = '/Admin/Account/SignIn';
+                        } else {
+                            // ✅ هنا السر: بنعرض الرسالة اللي جاية من السيرفر (You already own this course)
+                            alert(response.message);
+                            // لو بتستخدم مكتبة toastr:
+                            // toastr.warning(response.message);
+                        }
+                    }
+                },
+                error: function () {
+                    // حالة خطأ في السيرفر
+                    $(btnElement).html(originalText);
+                    $(btnElement).prop('disabled', false);
+                    alert("Something went wrong. Please try again.");
+                }
+            });
+        }
+    </script>
+}
