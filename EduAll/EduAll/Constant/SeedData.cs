@@ -58,55 +58,55 @@ namespace EduAll.Constant
 
             // Create Student
 
-            var student = new AppUser
-            {
-                FirstName = "Ahmed",
-                LastName = "Gamal",
-                Country = "Egypt",
-                Email = "Student123@gmail.com",
-                UserName = "Student123@gmail.com"
-            };
+            //var student = new AppUser
+            //{
+            //    FirstName = "Ahmed",
+            //    LastName = "Gamal",
+            //    Country = "Egypt",
+            //    Email = "Student123@gmail.com",
+            //    UserName = "Student123@gmail.com"
+            //};
 
-            // Check If User Is Found
-            var existstudent = await usermanager.FindByEmailAsync(student.Email);
+            //// Check If User Is Found
+            //var existstudent = await usermanager.FindByEmailAsync(student.Email);
 
-            // Create User If Not Found
-            if (existstudent == null)
-            {
-                var createResult = await usermanager.CreateAsync(student, "student@123");
+            //// Create User If Not Found
+            //if (existstudent == null)
+            //{
+            //    var createResult = await usermanager.CreateAsync(student, "student@123");
 
-                // Add Role Student To User
-                if (createResult.Succeeded)
-                {
-                    await usermanager.AddToRoleAsync(student, Roles.Student.ToString());
-                }
-            }
+            //    // Add Role Student To User
+            //    if (createResult.Succeeded)
+            //    {
+            //        await usermanager.AddToRoleAsync(student, Roles.Student.ToString());
+            //    }
+            //}
 
             // Create Instructor
 
-            var instructor = new AppUser
-            {
-                FirstName = "Mr_Abdo",
-                LastName = "Safah",
-                Country = "Egypt",
-                Email = "inst123@gmail.com",
-                UserName = "inst123@gmail.com"
-            };
+            //var instructor = new AppUser
+            //{
+            //    FirstName = "Mr_Abdo",
+            //    LastName = "Safah",
+            //    Country = "Egypt",
+            //    Email = "inst123@gmail.com",
+            //    UserName = "inst123@gmail.com"
+            //};
 
-            // Check If User Is Found
-            var existinst = await usermanager.FindByEmailAsync(instructor.Email);
+            //// Check If User Is Found
+            //var existinst = await usermanager.FindByEmailAsync(instructor.Email);
 
-            // Create User If Not Found
-            if (existinst == null)
-            {
-                var createResult = await usermanager.CreateAsync(instructor, "student@123");
+            //// Create User If Not Found
+            //if (existinst == null)
+            //{
+            //    var createResult = await usermanager.CreateAsync(instructor, "student@123");
 
-                // Add Role Student To User
-                if (createResult.Succeeded)
-                {
-                    await usermanager.AddToRoleAsync(instructor, Roles.Instructor.ToString());
-                }
-            }
+            //    // Add Role Student To User
+            //    if (createResult.Succeeded)
+            //    {
+            //        await usermanager.AddToRoleAsync(instructor, Roles.Instructor.ToString());
+            //    }
+            //}
         }
     }
 }

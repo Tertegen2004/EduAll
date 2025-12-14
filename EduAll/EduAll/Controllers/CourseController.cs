@@ -25,15 +25,14 @@ namespace EduAll.Controllers
         {
 
 
-            // 1. هات الـ ID بتاع اليوزر الحالي
+            
             var userId = usermanager.GetUserId(User);
 
-            // 2. هات قائمة الكورسات اللي اليوزر ضايفها في الوش ليست (عشان نقارن بيها)
-            // بنستخدم HashSet عشان البحث فيه سريع جداً
+
             var wishlistCourseIds = new HashSet<int>();
             if (userId != null)
             {
-                // افترضنا أن عندك ريبوسيتوري للوش ليست، أو ممكن تستخدم Context مباشرة لو متاح
+                
                 var wishlists = await unite.Wishlist.GettAll()
                                         .Where(w => w.UserId == userId)
                                         .Select(w => w.CourseId)
@@ -43,7 +42,7 @@ namespace EduAll.Controllers
 
             int pageSize = 9; // عدد الكورسات في الصفحة
 
-            // 1. تجهيز الاستعلام الأساسي
+           
             var query = unite.Course.GettAll()
                 .Include(c => c.Category)
                 .Include(c => c.Instructor)
@@ -51,21 +50,21 @@ namespace EduAll.Controllers
                 .Include(c => c.Sections).ThenInclude(s => s.Lessons)
                 .AsQueryable();
 
-            // 2. البحث (Search)
+            
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(c => c.Title.Contains(search) || c.Category.Name.Contains(search));
             }
 
-            // 3. الفرز (Sorting)
+            
             query = sortBy switch
             {
                 "Popular" => query.OrderByDescending(c => c.Enrollments.Count),
-                "Trending" => query.OrderByDescending(c => c.Price), // مجرد مثال
-                _ => query.OrderByDescending(c => c.Id) // الافتراضي: Newest
+                "Trending" => query.OrderByDescending(c => c.Price), 
+                _ => query.OrderByDescending(c => c.Id) 
             };
 
-            // 4. الباجينيشن (Pagination)
+            
             int totalCourses = await query.CountAsync();
             var coursesData = await query
                 .Skip((page - 1) * pageSize)
@@ -81,8 +80,6 @@ namespace EduAll.Controllers
                     .ToListAsync()).ToHashSet();
             }
 
-            // 5. التحويل للـ ViewModel
-            // (استخدم نفس دالة التنظيف GetFilterClass لو محتاجها، أو اكتبها هنا)
             var coursesVM = coursesData.Select(c => new HomeCourse_vm
             {
                 Id = c.Id,
@@ -100,7 +97,6 @@ namespace EduAll.Controllers
                 Level = c.Level.ToString()
             }).ToList();
 
-            // 6. تجهيز الموديل النهائي
             var model = new CoursesPage_vm
             {
                 Courses = coursesVM,
@@ -174,7 +170,6 @@ namespace EduAll.Controllers
                     }).ToList()
                 }).ToList(),
 
-                // الريفيوز
                 Reviews = course.Reviews.OrderByDescending(r => r.CreatedAt).Take(5).Select(r => new Review_vm
                 {
                     ReviewerName = (r.User != null) ? $"{r.User.FirstName} {r.User.LastName}" : "Unknown User",
@@ -194,7 +189,7 @@ namespace EduAll.Controllers
         {
             var userId = usermanager.GetUserId(User);
 
-            // 1. التحقق من الاشتراك
+
             var isEnrolled = await unite.Enrollment.GettAll()
                 .AnyAsync(e => e.CourseId == id && e.UserId == userId);
 
@@ -204,7 +199,7 @@ namespace EduAll.Controllers
                 return RedirectToAction("Details", new { id = id });
             }
 
-            // 2. (هام) جلب الكورس ومحتوياته أولاً
+     
             var course = await unite.Course.GettAll()
                 .Include(c => c.Instructor)
                 .Include(c => c.Sections).ThenInclude(s => s.Lessons)
@@ -213,8 +208,7 @@ namespace EduAll.Controllers
 
             if (course == null) return NotFound();
 
-            // 3. (التعديل هنا) جلب الكويزات الناجحة بناءً على الكويزات الموجودة في الكورس
-            // بنجمع كل أرقام الكويزات في الكورس ده
+ 
             var courseQuizIds = course.Sections
                                       .SelectMany(s => s.Quizzes)
                                       .Select(q => q.Id)
@@ -237,7 +231,6 @@ namespace EduAll.Controllers
             var enrollment = await unite.Enrollment.GettAll()
                 .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == id);
 
-            // 4. تحديد الدرس الحالي
             var orderedSections = course.Sections.OrderBy(s => s.Order).ToList();
             Lesson currentLesson = null;
 
@@ -256,7 +249,7 @@ namespace EduAll.Controllers
                 return RedirectToAction("Index", "MyCourses");
             }
 
-            // 5. منطق القفل (تم تحسينه)
+            
             var sectionsVm = new List<Section_vm>();
             bool unlockNextSection = true; // أول سكشن دايماً مفتوح
 
@@ -305,7 +298,6 @@ namespace EduAll.Controllers
                 // لو السكشن الحالي مفيهوش كويزات، unlockNextSection هتفضل زي ما هي (مفتوحة)
             }
 
-            // 6. حماية إضافية (منع فتح درس في سكشن مقفول)
             var targetSectionVm = sectionsVm.FirstOrDefault(s => s.Lessons.Any(l => l.Id == currentLesson.Id));
             if (targetSectionVm != null && targetSectionVm.IsLocked)
             {
@@ -318,13 +310,12 @@ namespace EduAll.Controllers
                     return RedirectToAction("Watch", new { id = id, lessonId = safeLesson.Id });
             }
 
-            // 7. أزرار التنقل
+ 
             var allLessons = orderedSections.SelectMany(s => s.Lessons.OrderBy(l => l.Order)).ToList();
             var currentIndex = allLessons.FindIndex(l => l.Id == currentLesson.Id);
             int? prevId = (currentIndex > 0) ? allLessons[currentIndex - 1].Id : null;
             int? nextId = (currentIndex < allLessons.Count - 1) ? allLessons[currentIndex + 1].Id : null;
 
-            // 8. الموديل النهائي
             var model = new WatchCourse_vm
             {
                 CourseId = course.Id,

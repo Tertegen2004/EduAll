@@ -48,7 +48,7 @@ namespace EduAll.Controllers
         {
             var user = await usermanager.GetUserAsync(User);
 
-            // 1. جلب عناصر الكارت
+           
             var cartItems = await unite.CartItem.GettAll()
                 .Include(c => c.Course)
                 .Where(c => c.Cart.UserId == user.Id)
@@ -56,7 +56,7 @@ namespace EduAll.Controllers
 
             if (!cartItems.Any()) return RedirectToAction("Index", "Cart");
 
-            // 2. إنشاء الاشتراكات (Enrollments)
+            
             var enrollments = cartItems.Select(item => new Enrollment
             {
                 UserId = user.Id,
@@ -67,11 +67,11 @@ namespace EduAll.Controllers
 
             await unite.Enrollment.CreateRange(enrollments);
 
-            // 3. تفريغ الكارت
+            
             await unite.CartItem.DeleteAll(cartItems);
 
 
-            // 5. توجيه لصفحة نجاح أو كورساتي
+            
             TempData["SuccessMessage"] = "Payment Successful! Courses added to your library.";
             return RedirectToAction("Index", "MyCourses");
         }

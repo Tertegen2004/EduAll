@@ -50,7 +50,7 @@ namespace EduAll.Controllers
             return PartialView("_QuizModalContent", model);
         }
 
-        // 2. أكشن لاستلام الإجابات وتصحيحها (POST)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitQuiz(QuizSubmission_vm model)
@@ -64,7 +64,7 @@ namespace EduAll.Controllers
 
             if (quizOriginal == null) return Json(new { success = false, message = "Quiz not found" });
 
-            // 2. التصحيح
+           
             int totalScore = 0;
             int studentScore = 0;
             var studentAnswersList = new List<StudentAnswer>();
@@ -81,7 +81,7 @@ namespace EduAll.Controllers
             {
                 totalScore += question.Score;
 
-                // هل الطالب جاوب السؤال ده؟
+                
                 if (model.Answers.ContainsKey(question.Id))
                 {
                     int selectedOptionId = model.Answers[question.Id];
@@ -108,10 +108,10 @@ namespace EduAll.Controllers
             submission.IsPassed = studentScore >= quizOriginal.PassingScore;
             submission.StudentAnswers = studentAnswersList;
 
-            // 4. الحفظ في الداتا بيز
+            
             await unite.QuizSubmission.Create(submission);
 
-            // 5. إرجاع النتيجة
+            
             return Json(new
             {
                 success = true,

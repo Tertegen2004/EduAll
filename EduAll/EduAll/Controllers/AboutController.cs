@@ -24,20 +24,18 @@ namespace EduAll.Controllers
         
         public async Task<IActionResult> Index()
         {
-            // 1. جلب المستخدمين اللي عندهم دور "Instructor"
+
             var instructors = await usermanager.GetUsersInRoleAsync(Roles.Instructor.ToString());
 
-            // 2. تحويل البيانات للـ ViewModel
+        
             var instructorVMs = new List<InstructorCard_vm>();
 
             foreach (var user in instructors)
             {
-                // ممكن تحتاج تجيب تفاصيل إضافية من الداتا بيز (زي الكورسات)
-                // لو العلاقة موجودة في AppUser، ممكن تستخدمها مباشرة
-                // لكن GetUsersInRoleAsync بترجع User بس، فممكن نحتاج نعمل Query تاني
+      
 
                 var courses = await unite.Course.GettAll()
-                    .Where(c => c.InstructorId == user.Id) // تأكد من اسم الـ FK
+                    .Where(c => c.InstructorId == user.Id) 
                     .Include(c => c.Enrollments)
                     .ToListAsync();
 

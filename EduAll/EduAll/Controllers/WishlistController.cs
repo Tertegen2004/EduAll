@@ -40,7 +40,7 @@ namespace EduAll.Controllers
                     LessonsCount = w.Course.Sections.SelectMany(s => s.Lessons).Count(),
                     DurationHours = w.Course.Duration, // قيمة افتراضية
                     Level = w.Course.Level,
-                    IsWishlisted = true // طبعاً لأننا في صفحة الوش ليست
+                    IsWishlisted = true 
                 })
             .ToListAsync();
 

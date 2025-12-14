@@ -28,7 +28,7 @@ namespace EduAll.Controllers
             var userId = usermanager.GetUserId(User);
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            // 1. جلب الاشتراكات (Enrollments) فقط
+            
             var enrollments = await unite.Enrollment.GettAll()
                 .Include(e => e.Course).ThenInclude(c => c.Category)
                 .Include(e => e.Course).ThenInclude(c => c.Instructor)
@@ -38,7 +38,7 @@ namespace EduAll.Controllers
                 .Where(e => e.UserId == userId)
                 .ToListAsync();
 
-            // 2. تقسيم الكورسات (Ongoing vs Completed)
+           
             var model = new MyCourses_vm
             {
                 // الكورسات الجارية (أقل من 100%)
@@ -53,7 +53,7 @@ namespace EduAll.Controllers
                     .Select(e => MapToVM(e.Course, e.Progress))
                     .ToList(),
 
-                // WishlistCourses = new List<Course_vm>() // شلناها أو نسيبها فاضية
+               
             };
 
             return View(model);

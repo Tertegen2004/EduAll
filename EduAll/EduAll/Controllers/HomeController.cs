@@ -18,7 +18,7 @@ namespace EduAll.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // 1. جلب الأقسام (أول 6 مثلاً)
+            
             var categories = await unite.Category.GettAll()
             .Include(c => c.Courses) // عشان نعرف نعد الكورسات
             .Take(8)
@@ -34,7 +34,7 @@ namespace EduAll.Controllers
                 BgColorClass = (c.Id % 3 == 0) ? "bg-main-three-25" : (c.Id % 2 == 0) ? "bg-main-two-25" : "bg-main-25"
             }).ToList();
 
-            // 2. جلب الكورسات الشائعة (الأعلى تقييماً أو الأحدث)
+         
             var popularCourses = await unite.Course.GettAll()
                 .Include(c => c.Category)
                 .Include(c=>c.Enrollments)

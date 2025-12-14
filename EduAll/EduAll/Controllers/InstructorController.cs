@@ -22,11 +22,11 @@ namespace EduAll.Controllers
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            // 1. جلب بيانات المدرب
+            
             var instructor = await usermanager.FindByIdAsync(id);
             if (instructor == null) return NotFound();
 
-            // 2. جلب كورسات المدرب
+            
             var courses = await unite.Course.GettAll()
                 .Include(c => c.Category)
                 .Include(c => c.Enrollments)
@@ -34,10 +34,9 @@ namespace EduAll.Controllers
                 .Where(c => c.InstructorId == id)
                 .ToListAsync();
 
-            // 3. حساب الإحصائيات
             var studentsCount = courses.Sum(c => c.Enrollments.Count);
 
-            // 4. تحويل الكورسات للـ VM (استخدم نفس المابينج القديم أو دالة مساعدة)
+            
             var coursesVM = courses.Select(c => new HomeCourse_vm
             {
                 Id = c.Id,
@@ -52,7 +51,7 @@ namespace EduAll.Controllers
                 // تأكد من حساب IsWishlisted لو اليوزر الحالي مسجل دخول (زي ما عملنا في الهوم)
             }).ToList();
 
-            // 5. بناء الموديل النهائي
+            
             var model = new InstructorDetails_vm
             {
                 Id = instructor.Id,

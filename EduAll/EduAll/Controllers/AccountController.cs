@@ -33,7 +33,7 @@ namespace EduAll.Controllers
                     PhoneNumber = user.PhoneNumber,
                     JobTitle = user.JobTitle,
                     ImgUrl = user.ImgUrl,
-                    Bio = user.Bio // تأكد إن الخاصية دي موجودة في AppUser
+                    Bio = user.Bio 
                 }
             };
 
@@ -73,7 +73,7 @@ namespace EduAll.Controllers
             user.JobTitle = model.Profile.JobTitle;
             user.Bio = model.Profile.Bio;
 
-            // تحديث الإيميل (يحتاج توكن وتأكيد في الوضع الطبيعي، لكن هنا هنغيره مباشرة للتسهيل)
+            
             if (user.Email != model.Profile.Email)
             {
                 user.Email = model.Profile.Email;
@@ -92,7 +92,7 @@ namespace EduAll.Controllers
                     ModelState.AddModelError("", error.Description);
             }
 
-            // إعادة تحميل الصفحة لتجنب مشاكل الفيو
+           
             return RedirectToAction(nameof(Settings));
         }
 
@@ -102,7 +102,7 @@ namespace EduAll.Controllers
             var user = await usermanager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login");
 
-            if (ModelState.IsValid) // أو افحص model.Password بس
+            if (ModelState.IsValid) 
             {
                 var result = await usermanager.ChangePasswordAsync(user, model.Password.CurrentPassword, model.Password.NewPassword);
 

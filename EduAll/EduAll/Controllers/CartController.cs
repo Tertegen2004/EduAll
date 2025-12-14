@@ -22,8 +22,8 @@ namespace EduAll.Controllers
         {
             var userId = usermanager.GetUserId(User);
 
-            // 1. جلب الكارت الخاصة باليوزر
-            var cart = await unite.Cart.GettAll() // أو Use _context directly if Include is easier
+           
+            var cart = await unite.Cart.GettAll() 
                 .Include(c => c.CartItems).ThenInclude(ci => ci.Course).ThenInclude(co => co.Category)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
@@ -32,7 +32,7 @@ namespace EduAll.Controllers
                 return View(new Cart_vm()); // سلة فارغة
             }
 
-            // 2. تحويل البيانات للـ ViewModel
+            
             var model = new Cart_vm
             {
                 Items = cart.CartItems.Select(ci => new CartItem_vm
@@ -76,12 +76,12 @@ namespace EduAll.Controllers
                 return Json(new { success = false, message = "You already own this course! Check 'My Courses'." });
             }
 
-            // 1. البحث عن الكارت الخاصة بالمستخدم
+            
             var cart = await unite.Cart.GettAll()
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            // 2. لو مفيش كارت، نكريت واحدة جديدة
+            //  لو مفيش كارت، نكريت واحدة جديدة
             if (cart == null)
             {
                 cart = new Cart
@@ -93,16 +93,15 @@ namespace EduAll.Controllers
                 await unite.Cart.Create(cart);
             }
 
-            // 3. التأكد إن الكورس مش موجود في الكارت دي
+            //  التأكد إن الكورس مش موجود في الكارت دي
             if (cart.CartItems.Any(i => i.CourseId == courseId))
             {
                 return Json(new { success = false, message = "Course already in cart!" });
             }
 
-            // 4. إضافة الكورس (CartItem)
             var cartItem = new CartItem
             {
-                CartId = cart.Id, // ربطناه بالكارت اللي جبناها
+                CartId = cart.Id, 
                 CourseId = courseId
             };
 
@@ -111,7 +110,6 @@ namespace EduAll.Controllers
             // تحديث وقت الكارت
             cart.UpdatedAt = DateTime.Now;
 
-            // 5. حساب العدد الجديد للكارت
             var newCount = await unite.CartItem.GettAll()
                 .Where(ci => ci.Cart.UserId == userId)
                 .CountAsync(); ; // العدد القديم + العنصر الجديد
